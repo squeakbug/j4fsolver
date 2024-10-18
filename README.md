@@ -1,28 +1,49 @@
-# SMT решатель
+# Библиотека методов дискретного программирования
 
-Сравнение времени решения SAT-проблемы для различных алгоритмов
+## Состав библиотеки
 
-## Особенности / План действий
+* Поиск в дискретном пространстве состояний
+* SAT/SMT решатели
+
+## Особенности
 
 - [ ] Примеры с решением CSP проблем
 - [ ] DPLL и CDCL алгоритмы (Hard)
 - [ ] Интеграция с SMTLIBv2 (Hard)
+
+## Конфигурация
+
+```sh
+
+```
 
 ## Сборка
 
 ```sh
 git clone https://github.com/squeakbug/j4fsolver
 cd j4fsolver
-cargo build --release
+cabal install
 ```
 
-## Запуск тестов
+## Запуск
 
 ```sh
-cargo test
+cabal run
+```
+
+## Тестирование
+
+```sh
+cabal test
 ```
 
 ## Ссылки
+
+### SAT/SMT
+
+- [SMT-LIB](https://smt-lib.org/)
+- [bitwuzla](https://bitwuzla.github.io/)
+- [lean4](https://github.com/leanprover/lean4)
 
 - [Поддерживаемая библиотека для работы с булевыми формулами на Rust с документацией и примерами + SAT](https://github.com/booleworks/logicng-rs)
 - [Неподдерживаемая библотека для работы с ДРД](https://github.com/cfallin/boolean_expression)
