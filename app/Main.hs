@@ -1,26 +1,8 @@
-module Lab01 where
+module Main where
 
 import Data.Graph
 import Data.List.Split (splitOn)
 import System.IO
-
-parseEdge :: String -> (Int, Int)
-parseEdge line = let [from, to] = map read (splitOn "->" line) in (from, to)
-
-readGraph :: FilePath -> IO Graph
-readGraph filePath = do
-    contents <- readFile filePath
-    let edges = map parseEdge (lines contents)
-    return (buildG (0, maximum (map snd edges)) edges)
-
-writeGraph :: FilePath -> Graph -> IO ()
-writeGraph filePath graph = do
-    writeFile filePath (unlines [show from ++ " -> " ++ show to | (from, to) <- edges graph])
-
-outputGraphviz :: FilePath -> Graph -> IO ()
-outputGraphviz filePath graph =
-    let graphvizEdges = unlines ["  " ++ show from ++ " -> " ++ show to ++ ";" | (from, to) <- edges graph]
-    in writeFile filePath $ "digraph G {\n" ++ graphvizEdges ++ "\n}"
 
 data AppState = AppState {
     currentGraph :: Graph

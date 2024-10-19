@@ -21,9 +21,19 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules:  MyLib
+    exposed-modules:  LibSolver
     build-depends:    
-        base ^>=4.17.2.1
+        base ^>=4.17.2.1,
+        split,
+        relude,
+        megaparsec,
+        containers,
+        transformers,
+        lens,
+        graphviz,
+        vector,
+        combinat,
+        template-haskell,
 
     hs-source-dirs:   src
     default-language: GHC2021
@@ -33,7 +43,10 @@ executable j4fsolver
     main-is:          Main.hs
     build-depends:
         base ^>=4.17.2.1,
-        j4fsolver
+        j4fsolver,
+        containers,
+        split,
+        prettyprinter,
 
     hs-source-dirs:   app
     default-language: GHC2021
@@ -46,4 +59,5 @@ test-suite j4fsolver-test
     main-is:          Main.hs
     build-depends:
         base ^>=4.17.2.1,
-        j4fsolver
+        j4fsolver,
+        QuickCheck
