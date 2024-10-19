@@ -1,8 +1,16 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module LibSolver (someFunc) where
+module LibSolver
+    ( module LibSolver.Search
+    , module LibSolver.Graph
+    , module LibSolver.Executor
+    ) where
 
 import Relude
+
+import LibSolver.Search
+import LibSolver.Graph
+import LibSolver.Executor
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"

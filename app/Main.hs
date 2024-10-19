@@ -1,71 +1,80 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Main where
 
-import Data.Graph
-import Data.List.Split (splitOn)
-import System.IO
+import Control.Lens
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.State
 
-data AppState = AppState {
-    currentGraph :: Graph
-} deriving Show
+import LibSolver
 
-data Event = Init
-           | ReadGraph FilePath
-           | WriteGraph FilePath
-           | OutputGraphviz FilePath
-           | Exit
-           deriving (Eq, Show)
+data AppState = AppState
+    { _graph :: Graph Int
+    , _needExit :: Bool
+    } deriving (Show)
 
-updateState :: AppState -> Event -> IO AppState
-updateState state (ReadGraph filePath) = do
-    currentGraph <- readGraph filePath
-    return $ AppState { currentGraph }
+makeLenses ''AppState
 
-updateState state (WriteGraph filePath) = do
-    writeGraph filePath (currentGraph state)
-    return state
+initialState :: AppState
+initialState = AppState 
+    { _graph = Graph []
+    , _needExit = False
+    }
 
-updateState state (OutputGraphviz filePath) = do
-    outputGraphviz filePath (currentGraph state)
-    return state
+updateGraph :: Graph Int -> StateT AppState IO ()
+updateGraph = zoom graph . put
 
-updateState state Exit = return state
+modifyGraph :: (Graph Int -> Graph Int) -> StateT AppState IO ()
+modifyGraph = zoom graph . modify
 
-menu :: AppState -> IO ()
-menu initState = do
-    putStrLn "1. Read graph from file"
-    putStrLn "2. Write current graph to file"
-    putStrLn "3. Output graph in Graphviz form"
-    putStrLn "4. Exit from application"
-    putStrLn "Choose an option: "
-    option <- getLine
+---------------------------------------------------------------
+
+readGraph :: FilePath -> StateT AppState IO ()
+readGraph filepath = do
+    lift $ putStrLn $ "reading graph from " ++ filepath
+    contents <- lift $ readFile filepath
+    let parsedGraph = parseGraph contents
+    updateGraph parsedGraph
+
+writeToDotFileGraph :: FilePath -> StateT AppState IO ()
+writeToDotFileGraph filepath = do
+    lift $ putStrLn $ "writing graph to " ++ filepath
+    st <- get
+    let payload = serializeGraph $ st^.graph
+    lift $ writeFile filepath payload
+    return ()
+
+exit :: StateT AppState IO ()
+exit = do
+    lift $ putStrLn "*exiting*"
+
+menu :: StateT AppState IO ()
+menu = do
+    lift $ putStrLn "1. Read graph from file"
+    lift $ putStrLn "2. Output graph in Graphviz form"
+    lift $ putStrLn "3. Exit from application"
+    lift $ putStrLn "Choose an option: "
+    option <- lift getLine
     case option of
         "1" -> do
-            putStrLn "Enter filename: "
-            filename <- getLine
-            newState <- updateState initState (ReadGraph filename)
-            graph <- readGraph filename
-            putStrLn "Graph loaded."
-            menu newState
+            lift $ putStrLn "Enter filename: "
+            filename <- lift getLine
+            readGraph filename
+            menu
         "2" -> do
-            putStrLn "Enter filename: "
-            filename <- getLine
-            newState <- updateState initState (WriteGraph filename) 
-            putStrLn "Graph written."
-            menu newState
+            lift $ putStrLn "Enter filename: "
+            filename <- lift getLine
+            writeToDotFileGraph filename
+            menu
         "3" -> do
-            putStrLn "Enter filename: "
-            filename <- getLine
-            newState <- updateState initState (OutputGraphviz filename)
-            menu newState
-        "4" -> do
-            putStrLn "Exiting..."
+            lift $ putStrLn "Exiting..."
         _ -> do
-            putStrLn "Invalid option. Please try again."
-            newState <- updateState initState Exit
-            menu newState
+            lift $ putStrLn "Invalid option. Please try again."
+            menu
 
-emptyGraph :: Graph
-emptyGraph = buildG (0, -1) []
+---------------------------------------------------------------
 
 main :: IO ()
-main = menu AppState { currentGraph = emptyGraph }
+main = do
+    _endState <- execStateT menu initialState
+    return ()

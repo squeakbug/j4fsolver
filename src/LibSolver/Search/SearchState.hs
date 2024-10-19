@@ -1,8 +1,13 @@
-module SearchState where
+module LibSolver.Search.SearchState
+    ( SearchState
+    ) where
 
 -- Типаж представителя пространства состояний
-class (PartialEq a, Ord a) => SeachState a where
-    produce :: (Traversable t) => a -> t a
+class (Eq a, Ord a) => SearchState a where
+    produce :: a -> [a]
+
+instance SearchState Int where
+    produce = (:[]) . (+1)
 
 -- QUESTION: В каких системах операции 'сравнить два состояния' и 'определить, является ли данное состояние конечным' имеют разные стоимости
 
@@ -20,7 +25,7 @@ class (PartialEq a, Ord a) => SeachState a where
 -- ?) система с возможностью пройти одно и то же состояние в процессе поиска конечное число раз
  
 -- Типаж представителя пространства состояний со взвешанными дугами
-class (PartialEq a, Ord a) => WeightedSeachState a where
-    produce :: a -> [(Int, a)]
+-- class (PartialEq a, Ord a) => WeightedSeachState a where
+--    produce :: a -> [(Int, a)]
 
 -- TODO: цена дуги явно определяется не только текущей вершиной, но и правилами пространства:

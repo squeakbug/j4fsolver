@@ -21,7 +21,12 @@ common warnings
 
 library
     import:           warnings
-    exposed-modules:  LibSolver
+    exposed-modules:  
+        LibSolver,
+        LibSolver.Graph,
+        LibSolver.Search,
+        LibSolver.Search.SearchState
+
     build-depends:    
         base ^>=4.17.2.1,
         split,
@@ -33,6 +38,8 @@ library
         graphviz,
         vector,
         combinat,
+        aeson,
+        utf8-string,
         template-haskell,
 
     hs-source-dirs:   src
@@ -46,7 +53,10 @@ executable j4fsolver
         j4fsolver,
         containers,
         split,
+        transformers,
         prettyprinter,
+        lens,
+        template-haskell,
 
     hs-source-dirs:   app
     default-language: GHC2021

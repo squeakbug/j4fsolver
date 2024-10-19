@@ -1,4 +1,4 @@
-module Executor where
+module LibSolver.Executor where
 
 import Data.List
 
