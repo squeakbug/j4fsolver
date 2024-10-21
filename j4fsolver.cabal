@@ -25,6 +25,7 @@ library
         LibSolver,
         LibSolver.Graph,
         LibSolver.Search,
+        LibSolver.Search.Bfs,
         LibSolver.Search.SearchState
 
     build-depends:    

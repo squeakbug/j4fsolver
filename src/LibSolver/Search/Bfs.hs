@@ -4,6 +4,25 @@ module LibSolver.Search.Bfs
 
 import LibSolver.Graph
 
+data BFS a = BFS
+    { initGraph :: Graph a     -- Исходный граф
+    , currentGraph :: Graph a  -- 
+    , queue :: [Vertex a]      -- Очередь
+    , seen :: [Vertex a]       -- Просмотренные вершины
+    , path :: [[Char]]         -- Путь от корня до цели
+    }
+
+fromGraph :: Graph a -> BFS a
+fromGraph g = BFS
+    { initGraph = g
+    , currentGraph = Graph []
+    , queue = []
+    , seen = []
+    , path = []
+    }
+
+-----------------------------------------------------------------------------
+
 -- Проверка на наличие вершины в списке вершин на основе метки
 vertexInVertexes :: Vertex a -> [Vertex a] -> Bool
 vertexInVertexes _ [] = False
@@ -40,12 +59,20 @@ updateDistPred (x:y) dist predLabel =
         , vertexPredecessor = predLabel
         }) (x:y)
 
---     Вход       Промежуточный    Очередь       Просмотренные    Выход
-bfs :: Graph a -> Graph a       -> [Vertex a] -> [Vertex a]    -> Graph a
-bfs (Graph []) _ _ _ = Graph []
--- Если очередь пуста, выведите дерево (граф) поиска по первой ширине.
-bfs _ outGraph [] _ = outGraph
-bfs (Graph (a:b)) (Graph (c:d)) (e:f) seen@(g:h) = bfs inGraph outGraph queue seen'
+bfsHelper :: BFS a -> BFS a
+bfsHelper BFS
+    { initGraph=(Graph (a:b))
+    , currentGraph=(Graph (c:d))
+    , queue=(e:f)
+    , seen=(g:h)
+    , path=path
+    } = BFS
+    { initGraph=inGraph
+    , currentGraph=outGraph
+    , queue=queue
+    , seen=seen'
+    , path=path
+    }
     where inGraph = Graph (a:b)
           -- Получение текущей метки вершины.
           eLabel = vertexLabel e
@@ -66,3 +93,7 @@ bfs (Graph (a:b)) (Graph (c:d)) (e:f) seen@(g:h) = bfs inGraph outGraph queue se
           queue = f ++ enqueue
           -- Обновить список просмотренных вершин
           seen' = seen ++ enqueue
+
+bfs :: Graph a -> Maybe [[Char]]
+bfs (Graph []) = Nothing
+bfs = Just . path . bfsHelper . fromGraph
