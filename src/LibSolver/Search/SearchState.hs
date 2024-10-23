@@ -6,6 +6,9 @@ module LibSolver.Search.SearchState
 class (Eq a, Ord a) => SearchState a where
     produce :: a -> [a]
 
+class (Eq a, Ord a) => EvalSearchState a where
+    eval :: a -> bool
+
 instance SearchState Int where
     produce = (:[]) . (+1)
 

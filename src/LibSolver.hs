@@ -1,18 +1,19 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module LibSolver
-    ( module LibSolver.Search
-    , module LibSolver.Graph
+    ( module LibSolver.BoolExpr
     , module LibSolver.Executor
+    , module LibSolver.Graph
+    , module LibSolver.Propositional
+    , module LibSolver.SAT
+    , module LibSolver.Search
     ) where
 
-import Relude
-
-import LibSolver.Search
-import LibSolver.Graph
+import LibSolver.BoolExpr
 import LibSolver.Executor
-
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import LibSolver.Graph
+import LibSolver.Propositional
+import LibSolver.SAT
+import LibSolver.Search
 
 -- Как эффективно представлять пространства состояний (например, игровую карту)

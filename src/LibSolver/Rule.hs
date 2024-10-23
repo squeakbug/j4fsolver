@@ -1,1 +1,0 @@
-module Libsolver.Rule where

@@ -27,7 +27,7 @@ fromGraph g = BFS
 vertexInVertexes :: Vertex a -> [Vertex a] -> Bool
 vertexInVertexes _ [] = False
 vertexInVertexes Vertex { vertexLabel = label } (x:y) = 
-    foldl (\acc x -> vertexLabel x == label || acc) False (x:y)
+    foldl (\acc x' -> vertexLabel x' == label || acc) False (x:y)
 
 -- Принимает граф, список меток и выдает список вершин.
 graphVertexes :: Graph a -> [[Char]]-> [Vertex a]
@@ -64,7 +64,7 @@ bfsHelper BFS
     { initGraph=(Graph (a:b))
     , currentGraph=(Graph (c:d))
     , queue=(e:f)
-    , seen=(g:h)
+    , seen=seen
     , path=path
     } = BFS
     { initGraph=inGraph
@@ -94,6 +94,8 @@ bfsHelper BFS
           -- Обновить список просмотренных вершин
           seen' = seen ++ enqueue
 
+bfsHelper b = b
+
 bfs :: Graph a -> Maybe [[Char]]
 bfs (Graph []) = Nothing
-bfs = Just . path . bfsHelper . fromGraph
+bfs g = (Just . path . bfsHelper . fromGraph) g

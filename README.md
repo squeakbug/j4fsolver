@@ -3,6 +3,8 @@
 ## Состав библиотеки
 
 * Поиск в дискретном пространстве состояний
+* Преобразование булевых выражений
+* Эмуляторы абстрактных машин
 * SAT/SMT решатели
 
 ## Особенности
@@ -44,6 +46,8 @@ cabal test
 - [SMT-LIB](https://smt-lib.org/)
 - [bitwuzla](https://bitwuzla.github.io/)
 - [lean4](https://github.com/leanprover/lean4)
+
+- [Реализация DPLL и BF sat-решателей](https://www.gibiansky.com/blog/verification/writing-a-sat-solver/index.html)
 
 - [Поддерживаемая библиотека для работы с булевыми формулами на Rust с документацией и примерами + SAT](https://github.com/booleworks/logicng-rs)
 - [Неподдерживаемая библотека для работы с ДРД](https://github.com/cfallin/boolean_expression)
