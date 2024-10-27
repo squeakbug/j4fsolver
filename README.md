@@ -41,6 +41,10 @@ cabal test
 
 ## Ссылки
 
+### Haskell
+
+* [Nix-style-builds](https://cabal.readthedocs.io/en/3.4/nix-local-build-overview.html#nix-style-builds)
+
 ### Поиск
 
 * [Введение монады Search и трансформера монад SearchT](https://github.com/ennocramer/monad-dijkstra)
@@ -85,6 +89,10 @@ cabal test
 
 * [The Art of the Propagator by Edvard Kmett](https://github.com/ekmett/propagators)
 * [Propagation Networks by Alexey Andreyevich Radul](https://groups.csail.mit.edu/genesis/papers/radul%202009.pdf), 
+
+### Defuzzification
+
+* [Lotfi A. Zadeh](https://en.wikipedia.org/wiki/Lotfi_A._Zadeh)
 
 --- ---
 

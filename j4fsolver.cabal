@@ -16,6 +16,10 @@ build-type:         Simple
 
 extra-doc-files:    CHANGELOG.md
 
+source-repository head
+    type:     git
+    location: https://github.com/squeakbug/j4fsolver
+
 common warnings
     ghc-options: -Wall
 
@@ -39,19 +43,23 @@ library
         LibSolver.Search.SearchState
 
     build-depends:
-          aeson
-        , base ^>=4.17.2.1
+          base ^>=4.17.2.1
+
         , combinat
         , containers
+        , psqueues
+        , vector
+        
+        , aeson
+        , megaparsec
+        , utf8-string
+
         , graphviz
         , lens
-        , megaparsec
         , relude
         , split
         , template-haskell
         , transformers
-        , vector
-        , utf8-string
 
     hs-source-dirs:   src
     default-language: GHC2021
@@ -99,3 +107,15 @@ test-suite j4fsolver-test
           base ^>=4.17.2.1
         , j4fsolver
         , QuickCheck
+        , tasty
+        , hspec
+
+test-suite j4fsolver-style
+    type:             exitcode-stdio-1.0
+    main-is:          HLint.hs
+    hs-source-dirs:   test
+    default-language: GHC2021
+    ghc-options:      -Wall -threaded -rtsopts -with-rtsopts=-N
+    build-depends:
+        base >=4.7 && <5,
+        hlint >=1.0 && <4
