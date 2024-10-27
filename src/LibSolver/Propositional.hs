@@ -1,2 +1,0 @@
-module LibSolver.Propositional where
-

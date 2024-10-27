@@ -30,9 +30,9 @@ library
         LibSolver.BoolExpr
         LibSolver.Executor
         LibSolver.Graph
-        LibSolver.Propositional
-        LibSolver.Propositional.Forward
-        LibSolver.Propositional.Backward
+        LibSolver.Proposition
+        LibSolver.Proposition.Forward
+        LibSolver.Proposition.Backward
         LibSolver.SAT
         LibSolver.Search
         LibSolver.Search.AStar

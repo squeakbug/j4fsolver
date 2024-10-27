@@ -4,7 +4,7 @@ module LibSolver
     ( module LibSolver.BoolExpr
     , module LibSolver.Executor
     , module LibSolver.Graph
-    , module LibSolver.Propositional
+    , module LibSolver.Proposition
     , module LibSolver.SAT
     , module LibSolver.Search
     ) where
@@ -12,7 +12,7 @@ module LibSolver
 import LibSolver.BoolExpr
 import LibSolver.Executor
 import LibSolver.Graph
-import LibSolver.Propositional
+import LibSolver.Proposition
 import LibSolver.SAT
 import LibSolver.Search
 

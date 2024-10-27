@@ -1,6 +1,6 @@
 module LibSolver.SAT where
 
-import LibSolver.BoolExpr (Expr)
+import LibSolver.BoolExpr (Boolean, BoolExpr)
 
-class SATSolver where
-    satisfiable :: Expr -> Bool
+class (Boolean a) => SATSolver a where
+    satisfiable :: BoolExpr a -> Bool

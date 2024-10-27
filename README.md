@@ -45,6 +45,10 @@ cabal test
 
 * [Nix-style-builds](https://cabal.readthedocs.io/en/3.4/nix-local-build-overview.html#nix-style-builds)
 
+### Boolean expressions transformations
+
+* [boolexpr](https://github.com/boolexpr/boolexpr)
+
 ### Поиск
 
 * [Введение монады Search и трансформера монад SearchT](https://github.com/ennocramer/monad-dijkstra)
