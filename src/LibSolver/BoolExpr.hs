@@ -1,6 +1,7 @@
 module LibSolver.BoolExpr where
 
 import Control.Applicative ((<|>))
+import Data.Maybe (catMaybes, mapMaybe)
 import Data.Set (Set)
 import qualified Data.Set as Set
 
@@ -121,10 +122,6 @@ cnf expr =
   
   where
     updated = distribute (fixNegations expr)
-
--- catMaybes :: [Maybe a] -> [a]
--- Extract only the Just values of a list.
-import Data.Maybe (catMaybes)
 
 -- Literal polarity. Positive means the literal
 -- is never negated; negative means it always is.

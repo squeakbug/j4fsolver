@@ -8,8 +8,8 @@ module LibSolver.Search
     ) where
 
 import LibSolver.Search.AStar
-import LibSolver.Search.Bfs
+import LibSolver.Search.Bfs (bfs)
 import LibSolver.Search.Dfs
 import LibSolver.Search.Heuristic
 import LibSolver.Search.InfoSearch
-import LibSolver.Search.SearchState
+import LibSolver.Search.SearchState (SearchState)

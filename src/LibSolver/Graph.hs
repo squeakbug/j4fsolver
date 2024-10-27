@@ -5,9 +5,8 @@
 module LibSolver.Graph 
     ( Vertex(..)
     , Graph(..)
-    , Arc
+    , Arc(..)
     , parseGraph
-    , serializeGraph
     , vertices
     , arcs
     ) where
@@ -18,13 +17,12 @@ import Data.List.Split (splitOn)
 
 import LibSolver.Search.SearchState (SearchState)
 
+type VertexLabel = [Char]
+
 data Vertex a where
     Vertex :: (SearchState a, Read a) => 
-        { vertexLabel :: [Char]
+        { vertexLabel :: VertexLabel
         , vertexState :: a
-        , vertexNeighbors :: [[Char]]
-        , vertexDistance :: Int
-        , vertexPredecessor :: [Char]
         } -> Vertex a
 
 deriving instance Show a => Show (Vertex a)
@@ -32,7 +30,11 @@ deriving instance Show a => Show (Vertex a)
 -- Определяем граф, как список вершин.
 -- Каждая вершина - это метка, список смежности (соседи),
 -- расстояние от корня и метка-предшественник.
-newtype Graph a = Graph [Vertex a] deriving (Show)
+data Graph a where
+    Graph :: 
+        { vs ::[Vertex a]
+        , vertexNeighbors :: VertexLabel -> [VertexLabel]
+        } -> Graph a
 
 -- Дуга
 data Arc = Arc
@@ -43,13 +45,14 @@ data Arc = Arc
 -----------------------------------------------------------------------------
 
 vertices :: Graph a -> [Vertex a]
-vertices g = []
+vertices _ = []
 
 arcs :: Graph a -> [Arc]
-arcs g = []
+arcs _ = []
 
 -----------------------------------------------------------------------------
 
+trim :: [Char] -> [Char]
 trim = dropWhileEnd isSpace . dropWhile isSpace
 
 parseArc :: String -> Arc
@@ -68,16 +71,13 @@ parseVertexData line = let [label, dt] = splitOn ":" line in (trim label, read d
 parseLine :: [Char] -> ([Char], [[Char]])
 parseLine line = let [v, ns] = map trim $ splitOn "->" line in (v, parseVertexNeighbors ns)
 
-buildVertex :: (SearchState a, Read a) => [Char] -> [[Char]] -> a -> Vertex a
-buildVertex label ns d = Vertex 
+buildVertex :: (SearchState a, Read a) => [Char] -> a -> Vertex a
+buildVertex label d = Vertex 
     { vertexLabel = label
     , vertexState = d
-    , vertexNeighbors = ns
-    , vertexDistance = 0
-    , vertexPredecessor = ""
     }
 
-buildGraph :: (SearchState a, Read a) => [Vertex a] -> Graph a
+buildGraph :: (SearchState a, Read a) => [Vertex a] -> (VertexLabel -> [VertexLabel]) -> Graph a
 buildGraph = Graph
 
 parseGraph :: (SearchState a, Read a) => [Char] -> Graph a
@@ -87,6 +87,3 @@ parseGraph contents =
         [vds, ds] = splitOn "---" contents
         pvds = map parseLine $ lines vds
         pds = map parseVertexData (splitOn "\n\n" ds)
-
-serializeGraph :: (Show a) => Graph a -> [Char]
-serializeGraph = show

@@ -60,7 +60,7 @@ executable j4fsolver
     import:           warnings
     main-is:          Main.hs
     build-depends:
-        base ^>=4.17.2.1
+          base ^>=4.17.2.1
         , j4fsolver
         , containers
         , split
@@ -72,6 +72,23 @@ executable j4fsolver
     hs-source-dirs:   app
     default-language: GHC2021
 
+executable eight-queens
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:
+          base ^>=4.17.2.1
+        , j4fsolver
+        , containers
+        , split
+        , relude
+        , transformers
+        , prettyprinter
+        , lens
+        , template-haskell
+
+    hs-source-dirs:   examples/EightQueens
+    default-language: GHC2021
+
 test-suite j4fsolver-test
     import:           warnings
     default-language: GHC2021
@@ -79,6 +96,6 @@ test-suite j4fsolver-test
     hs-source-dirs:   test
     main-is:          Main.hs
     build-depends:
-        base ^>=4.17.2.1,
-        j4fsolver,
-        QuickCheck
+          base ^>=4.17.2.1
+        , j4fsolver
+        , QuickCheck
