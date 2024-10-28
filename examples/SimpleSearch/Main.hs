@@ -7,9 +7,11 @@ import Control.Monad.Trans.Class
 import Control.Monad.Trans.State
 
 import LibSolver
+import LibSolver.DiGraph
+import LibSolver.DiGraph.Vertices
 
 data AppState = AppState
-    { _graph :: Graph Int
+    { _graph :: DiGraph Int
     , _needExit :: Bool
     } deriving (Show)
 

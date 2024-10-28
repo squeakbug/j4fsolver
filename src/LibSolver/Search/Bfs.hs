@@ -1,15 +1,15 @@
+{-# LANGUAGE DatatypeContexts #-}
+
 module LibSolver.Search.Bfs
     ( bfsFromGoal
     , bfsFromPredicate
     ) where
 
-import Codec.Binary.UTF8.Generic (UTF8Bytes(empty))
-
 import LibSolver.DiGraph
 import LibSolver.Vertex
 
-data BFS a = BFS
-    { graph      :: DiGraph a        -- Исходный граф
+data (DiGraph dg) => BFS dg a = BFS
+    { graph      :: dg               -- Исходный граф
     , isFinal    :: Vertex a -> Bool -- Предикат: вершина является целевой
     , queue      :: [Vertex a]       -- Очередь
     , seen       :: [Vertex a]       -- Просмотренные вершины
@@ -23,28 +23,30 @@ data BFSResult a = BFSResult
     , isFinded     :: Bool             -- Была ли найдена вершина
     }
 
-fromGoal :: (Eq a) => DiGraph a -> Vertex a -> Vertex a -> BFS a
-fromGoal g goal init = BFS
+fromGoal :: (DiGraph dg, Eq a) => dg -> Vertex a -> Vertex a -> BFS dg a
+fromGoal g goal initV = BFS
     { graph = g
     , isFinal = (== goal)
-    , queue = [init]
+    , queue = [initV]
     , seen  = []
     , path  = []
+    , isFinished = False
     }
 
-fromPredicate :: DiGraph a -> (Vertex a -> Bool) -> Vertex a -> BFS a
-fromPredicate g isGoal init = BFS
+fromPredicate :: (DiGraph dg) => dg -> (Vertex a -> Bool) -> Vertex a -> BFS dg a
+fromPredicate g isGoal initV = BFS
     { graph = g
     , isFinal = isGoal
-    , queue = [init]
+    , queue = [initV]
     , seen  = []
     , path  = []
+    , isFinished = False
     }
 
-fromBFS :: BFS a -> BFSResult a
+fromBFS :: DiGraph dg => BFS dg a -> BFSResult a
 fromBFS BFS
     { path=path
-    , queue=(v:f)
+    , queue=(v:_)
     } = BFSResult
     { finalPath = path
     , finalVertex = Just v
@@ -75,14 +77,14 @@ filterVertexNeighbors [] _ = []
 filterVertexNeighbors s vn = filter (\x -> not $ vertexInVertexes x s) vn
 
 -- Очередь пуста, а вершина не найдена -> заканчиваем поиск
-bfsStep :: BFS a -> BFS a
+bfsStep :: DiGraph dg => BFS dg a -> BFS dg a
 bfsStep BFS
     { graph=g
     , isFinal=isFinal
     , queue=[]
     , seen=seen
     , path=path
-    , isFinished=isFinished
+    , isFinished=_
     } = BFS
     { graph=g
     , isFinal=isFinal
@@ -93,13 +95,13 @@ bfsStep BFS
     }
 
 -- Искомая вершина найдена
-bfsStep b@BFS
+bfsStep BFS
     { graph=g
     , isFinal=isFinal
-    , queue=queue@(v:f)
+    , queue=queue@(v:_)
     , seen=seen
     , path=path
-    , isFinished=isFinished
+    , isFinished=_
     } | isFinal v = BFS
     { graph=g
     , isFinal=isFinal
@@ -110,13 +112,13 @@ bfsStep b@BFS
     }
 
 -- Иначе, если в очереди остались вершины
-bfsStep b@BFS
+bfsStep BFS
     { graph=g
     , isFinal=isFinal
     , queue=(v:f)
     , seen=seen
     , path=path
-    , isFinished=isFinished
+    , isFinished=_
     } = BFS
     { graph=g
     , isFinal=isFinal
@@ -125,21 +127,21 @@ bfsStep b@BFS
     , path=path'
     , isFinished=False
     }
-    where vNeighbours = _vertexNeighbours g v
+    where vNeighbours = giVertexNeighbors g v
           notSeenNeighbours = filterVertexNeighbors seen vNeighbours
           queue' = f ++ notSeenNeighbours
           seen' = v : seen
           path' = v : path
 
-bfsHelper :: BFS a -> BFS a
+bfsHelper :: DiGraph dg => BFS dg a -> BFS dg a
 bfsHelper initState =
     let nextStep = bfsStep initState
     in (if isFinished nextStep then nextStep else bfsHelper nextStep)
 
 -----------------------------------------------------------------------------
 
-bfsFromGoal :: (Eq a) => DiGraph a -> Vertex a -> Vertex a -> BFSResult a
-bfsFromGoal g fin init = fromBFS $ bfsHelper $ fromGoal g fin init
+bfsFromGoal :: (DiGraph dg , Eq a) => dg -> Vertex a -> Vertex a -> BFSResult a
+bfsFromGoal g fin initV = fromBFS $ bfsHelper $ fromGoal g fin initV
 
-bfsFromPredicate :: DiGraph a -> (Vertex a -> Bool) -> Vertex a -> BFSResult a
-bfsFromPredicate g fin init = fromBFS $ bfsHelper $ fromPredicate g fin init
+bfsFromPredicate :: (DiGraph dg) => dg -> (Vertex a -> Bool) -> Vertex a -> BFSResult a
+bfsFromPredicate g fin initV = fromBFS $ bfsHelper $ fromPredicate g fin initV

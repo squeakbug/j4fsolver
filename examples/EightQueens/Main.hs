@@ -4,16 +4,16 @@ module Main where
 
 import Relude
 
-import LibSolver.Search.SearchState (SearchState)
+-- import LibSolver.Search.SearchState (SearchState)
 
-type Placement = (Int, Int)
+-- type Placement = (Int, Int)
 
-data Board = Board
-    { placements :: [Placement]
-    }
+-- data Board = Board
+--     { placements :: [Placement]
+--     }
 
-instance SearchState Board where
-    produce (Board placements) = 
+-- instance SearchState Board where
+--     produce (Board placements) = 
 
 main :: IO ()
 main = do
