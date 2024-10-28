@@ -1,5 +1,7 @@
 # Библиотека методов дискретного программирования
 
+*А знаете где механизм сопоставления с образцом почти такой же классный? В Erlang! Там вовсе нет типизации!*
+
 ## Состав библиотеки
 
 * Поиск в дискретном пространстве состояний
@@ -57,6 +59,9 @@ cabal test
 ### Constraint solver
 
 * [Mad Props](https://github.com/ChrisPenner/mad-props)
+* [Python](https://github.com/python-constraint/python-constraint)
+* [Prolog](https://www.swi-prolog.org/pldoc/man?section=clp)
+* [Oz](https://github.com/mozart/mozart2)
 
 ### Graph rewriting / Subgraph isomorphism problem
 

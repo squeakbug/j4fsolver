@@ -1,5 +1,7 @@
 module LibSolver.SemiRing where
 
+import Data.Set (Set)
+
 class SemiRing a where
   -- | Addition
   (<+>) :: a -> a -> a
@@ -24,4 +26,3 @@ data BoolSemiRing = BoolSemiRing
     }
 
 -- data BoolBasis = BoolBasis
-

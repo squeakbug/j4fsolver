@@ -2,19 +2,27 @@
 
 module LibSolver
     ( module LibSolver.BoolExpr
+    , module LibSolver.Constraint
+    , module LibSolver.DiGraph
     , module LibSolver.Executor
     , module LibSolver.Graph
     , module LibSolver.Proposition
     , module LibSolver.SAT
     , module LibSolver.Search
+    , module LibSolver.SemiRing
+    , module LibSolver.Vertex
     ) where
 
 import LibSolver.BoolExpr
+import LibSolver.Constraint
+import LibSolver.DiGraph
 import LibSolver.Executor
 import LibSolver.Graph
 import LibSolver.Proposition
 import LibSolver.SAT
 import LibSolver.Search
+import LibSolver.SemiRing
+import LibSolver.Vertex
 
 -- Как эффективно представлять пространства состояний (например, игровую карту)?
 

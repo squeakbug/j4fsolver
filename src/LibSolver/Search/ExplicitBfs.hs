@@ -9,7 +9,7 @@ data BFS a = BFS
     , currentGraph :: Graph a  -- 
     , queue :: [Vertex a]      -- Очередь
     , seen :: [Vertex a]       -- Просмотренные вершины
-    , path :: [Vertex a]         -- Путь от корня до цели
+    , path :: [Vertex a]       -- Путь от корня до цели
     }
 
 fromGraph :: Graph a -> BFS a

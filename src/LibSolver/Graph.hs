@@ -3,46 +3,20 @@
 {-# LANGUAGE StandaloneDeriving  #-}
 
 module LibSolver.Graph 
-    ( Vertex(..)
-    , Graph(..)
-    , Arc(..)
-    , vertices
-    , arcs
+    ( Graph(..)
+    , Edge(..)
     ) where
 
-import Data.Char (isSpace)
-import Data.List (dropWhileEnd)
-import Data.List.Split (splitOn)
-import Data.Text (Text)
-
-import LibSolver.Search.SearchState (SearchState)
-
-type VertexLabel = Text
-
-data Vertex a where
-    Vertex :: (SearchState a, Read a) => 
-        { vertexLabel :: VertexLabel
-        , vertexState :: a
-        } -> Vertex a
-
-deriving instance Show a => Show (Vertex a)
+import LibSolver.Vertex (Vertex, VertexLabel)
 
 data Graph a where
     Graph :: 
-        { vs ::[Vertex a]
-        , vertexNeighbors :: VertexLabel -> [VertexLabel]
+        { gvs ::[Vertex a]
+        , gvertexNeighbors :: VertexLabel -> [VertexLabel]
         } -> Graph a
 
 -- Дуга
-data Arc = Arc
-    { from :: VertexLabel
-    , to :: VertexLabel
+data Edge = Edge
+    { left :: VertexLabel
+    , right :: VertexLabel
     }
-
------------------------------------------------------------------------------
-
-vertices :: Graph a -> [Vertex a]
-vertices _ = []
-
-arcs :: Graph a -> [Arc]
-arcs _ = []
