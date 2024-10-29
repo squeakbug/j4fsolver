@@ -1,20 +1,87 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 module Main where
 
 import Relude
 
--- import LibSolver.Search.SearchState (SearchState)
+import LibSolver.Vertex (Vertex(Vertex, vertexLabel), vertexState)
+import LibSolver.DiGraph (DiGraph(..))
+import LibSolver.Search.SearchState (SearchState (produce))
+import LibSolver.Search (SearchResult(..))
+import LibSolver.Search.Bfs (bfsFromPredicate)
+import LibSolver.Search.Dfs (dfsFromPredicate)
 
--- type Placement = (Int, Int)
+-----------------------------------------------------------------------------
 
--- data Board = Board
---     { placements :: [Placement]
---     }
+-- Описание задачи
 
--- instance SearchState Board where
---     produce (Board placements) = 
+newtype Board = Board Placement
+
+type Placement = [(Int, Int)]
+
+taskSize :: Int
+taskSize = 5
+
+-----------------------------------------------------------------------------
+
+-- Реализация интерфейса решателя
+
+instance SearchState Placement where
+    produce :: Placement -> [Placement]
+    produce p = [getNext p]
+
+initPlacement :: Placement
+initPlacement = map (, 0) [0..taskSize]
+
+initVertex :: Vertex Placement
+initVertex = Vertex { vertexState=initPlacement, vertexLabel="init"::Text }
+
+isFinal :: Placement -> Bool
+isFinal p = not (hasSameFstIndex p) && not (hasSameSndIndex p)
+
+isFinalVertex :: Vertex Placement -> Bool
+isFinalVertex (Vertex { vertexState=p }) = isFinal p
+
+hasDuplicates :: (Eq a) => [a] -> Bool
+hasDuplicates [] = False
+hasDuplicates (x:xs) = x `elem` xs || hasDuplicates xs
+
+hasSameFstIndex :: Placement -> Bool
+hasSameFstIndex s =
+    let xs = map fst s
+    in hasDuplicates xs
+
+hasSameSndIndex :: Placement -> Bool
+hasSameSndIndex s =
+    let xs = map snd s
+    in hasDuplicates xs
+
+-- Могут быть различные способы генерации всевозможных вариантов!
+getNext :: Placement -> Placement
+getNext [] = []
+getNext [(x, y)] = if y < taskSize then [(x, y + 1)] else [(x, y)]
+getNext ((x, y):s) = if y < taskSize then (x, y + 1):s else (x, 0):getNext s
+
+instance DiGraph Board Placement where
+    giVertexNeighbors :: Board -> Vertex Placement -> [Vertex Placement]
+    giVertexNeighbors _br (Vertex { vertexState=p }) = [Vertex
+        { vertexState=getNext p
+        , vertexLabel="test"::Text
+        }]
+
+-----------------------------------------------------------------------------
+
+-- Запуск решателя
+
+solveWithBfs :: SearchResult Placement
+solveWithBfs = bfsFromPredicate (Board initPlacement) isFinalVertex initVertex
+
+solveWithDfs :: SearchResult Placement
+solveWithDfs = dfsFromPredicate (Board initPlacement) isFinalVertex initVertex
 
 main :: IO ()
 main = do
-    putStrLn "Hello world!"
+    print $ finalVertex solveWithBfs
+    print $ finalVertex solveWithDfs

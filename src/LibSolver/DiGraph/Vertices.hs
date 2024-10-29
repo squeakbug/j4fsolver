@@ -1,9 +1,12 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Replace case with fromMaybe" #-}
 module LibSolver.DiGraph.Vertices 
     ( DiGraphVertices(..)
-
+    , vertices
+    , vertexNeighborsLabels
     ) where
 
-import Data.Map
+import Data.Map (Map, lookup)
 
 import LibSolver.DiGraph
 import LibSolver.Vertex
@@ -16,8 +19,8 @@ data DiGraphVertices a where
 
 -----------------------------------------------------------------------------
 
-instance DiGraph DiGraphVertices where
-    giVertices = vertices
+instance Ord a => DiGraph (DiGraphVertices a) a where
+    giVertexNeighbors :: DiGraphVertices a -> Vertex a -> [Vertex a]
     giVertexNeighbors = vertexNeighbors
 
 -----------------------------------------------------------------------------
@@ -25,9 +28,12 @@ instance DiGraph DiGraphVertices where
 vertices :: DiGraphVertices a -> [Vertex a]
 vertices DiGraphVertices { _vs=vs, _vertexNeighbours=_ } = vs
 
-vertexNeighborsLabels :: DiGraphVertices a -> Vertex a -> [VertexLabel]
-vertexNeighborsLabels DiGraphVertices { _vs=_, _vertexNeighbours=vns } = 
-   map vertexLabel . vns
+vertexNeighborsLabels :: Ord a => DiGraphVertices a -> Vertex a -> [VertexLabel]
+vertexNeighborsLabels g v = 
+   map vertexLabel $ vertexNeighbors g v
 
-vertexNeighbors :: DiGraphVertices a -> Vertex a -> [Vertex a]
-vertexNeighbors DiGraphVertices { _vs=_, _vertexNeighbours=vns } = vns
+vertexNeighbors :: Ord a => DiGraphVertices a -> Vertex a -> [Vertex a]
+vertexNeighbors DiGraphVertices { _vs=_, _vertexNeighbours=vns } v = 
+    case Data.Map.lookup v vns of
+        Just ns -> ns 
+        Nothing -> []

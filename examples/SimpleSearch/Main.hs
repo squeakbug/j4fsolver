@@ -10,6 +10,7 @@ import LibSolver
 import LibSolver.DiGraph
 import LibSolver.DiGraph.Vertices
 
+{-
 data AppState = AppState
     { _graph :: DiGraph Int
     , _needExit :: Bool
@@ -80,3 +81,8 @@ main :: IO ()
 main = do
     _endState <- execStateT menu initialState
     return ()
+-}
+
+main :: IO ()
+main = do
+    putStrLn "Hello world!"

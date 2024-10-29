@@ -1,12 +1,14 @@
 module LibSolver.Search
-    ( module LibSolver.Search.Bfs
-    , module LibSolver.Search.InfoSearch
-    , module LibSolver.Search.SearchState
+    ( SearchResult(..)
     ) where
 
-import LibSolver.Search.Bfs
-import LibSolver.Search.InfoSearch
-import LibSolver.Search.SearchState (SearchState)
+import LibSolver.Vertex (Vertex)
+
+data SearchResult a = SearchResult
+    { finalPath    :: [Vertex a]       -- Путь от корня до цели
+    , finalVertex  :: Maybe (Vertex a) -- Конечная вершина
+    , isFinded     :: Bool             -- Была ли найдена вершина
+    } deriving (Show)
 
 -- Хотелось бы обходить граф
 -- 1) Без зависимости от его представления (явно задан через ребра, вершины или неявно)

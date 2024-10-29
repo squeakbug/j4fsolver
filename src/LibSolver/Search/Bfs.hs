@@ -7,8 +7,9 @@ module LibSolver.Search.Bfs
 
 import LibSolver.DiGraph
 import LibSolver.Vertex
+import LibSolver.Search (SearchResult(..))
 
-data (DiGraph dg) => BFS dg a = BFS
+data (DiGraph dg a) => BFS dg a = BFS
     { graph      :: dg               -- Исходный граф
     , isFinal    :: Vertex a -> Bool -- Предикат: вершина является целевой
     , queue      :: [Vertex a]       -- Очередь
@@ -17,13 +18,7 @@ data (DiGraph dg) => BFS dg a = BFS
     , isFinished :: Bool
     }
 
-data BFSResult a = BFSResult
-    { finalPath    :: [Vertex a]       -- Путь от корня до цели
-    , finalVertex  :: Maybe (Vertex a) -- Конечная вершина
-    , isFinded     :: Bool             -- Была ли найдена вершина
-    }
-
-fromGoal :: (DiGraph dg, Eq a) => dg -> Vertex a -> Vertex a -> BFS dg a
+fromGoal :: (DiGraph dg a, Eq a) => dg -> Vertex a -> Vertex a -> BFS dg a
 fromGoal g goal initV = BFS
     { graph = g
     , isFinal = (== goal)
@@ -33,7 +28,7 @@ fromGoal g goal initV = BFS
     , isFinished = False
     }
 
-fromPredicate :: (DiGraph dg) => dg -> (Vertex a -> Bool) -> Vertex a -> BFS dg a
+fromPredicate :: (DiGraph dg a) => dg -> (Vertex a -> Bool) -> Vertex a -> BFS dg a
 fromPredicate g isGoal initV = BFS
     { graph = g
     , isFinal = isGoal
@@ -43,41 +38,36 @@ fromPredicate g isGoal initV = BFS
     , isFinished = False
     }
 
-fromBFS :: DiGraph dg => BFS dg a -> BFSResult a
+fromBFS :: DiGraph dg a => BFS dg a -> SearchResult a
 fromBFS BFS
     { path=path
     , queue=(v:_)
-    } = BFSResult
+    } = SearchResult
     { finalPath = path
     , finalVertex = Just v
     , isFinded = True
     }
 
 fromBFS BFS
-    { path=path
+    { path=_
+    , seen=seen
     , queue=[]
-    } = BFSResult
-    { finalPath = path
+    } = SearchResult
+    { finalPath = seen
     , finalVertex = Nothing
     , isFinded = False
     }
 
 -----------------------------------------------------------------------------
 
--- Проверка на наличие вершины в списке вершин на основе метки
-vertexInVertexes :: Vertex a -> [Vertex a] -> Bool
-vertexInVertexes _ [] = False
-vertexInVertexes Vertex { vertexLabel = label } (x:y) =
-    foldl (\acc x' -> vertexLabel x' == label || acc) False (x:y)
-
 -- Удаление из списка (2 аргумент) уже просмотренных вершин (1 аргумент)
-filterVertexNeighbors :: [Vertex a]   ->  [Vertex a]  -> [Vertex a]
+filterVertexNeighbors :: Eq a => [Vertex a]   ->  [Vertex a]  -> [Vertex a]
 filterVertexNeighbors _ [] = []
-filterVertexNeighbors [] _ = []
-filterVertexNeighbors s vn = filter (\x -> not $ vertexInVertexes x s) vn
+filterVertexNeighbors [] xs = xs
+filterVertexNeighbors s vn = filter (`notElem` s) vn
 
 -- Очередь пуста, а вершина не найдена -> заканчиваем поиск
-bfsStep :: DiGraph dg => BFS dg a -> BFS dg a
+bfsStep :: (DiGraph dg a, Eq a) => BFS dg a -> BFS dg a
 bfsStep BFS
     { graph=g
     , isFinal=isFinal
@@ -133,15 +123,15 @@ bfsStep BFS
           seen' = v : seen
           path' = v : path
 
-bfsHelper :: DiGraph dg => BFS dg a -> BFS dg a
+bfsHelper :: (DiGraph dg a, Eq a) => BFS dg a -> BFS dg a
 bfsHelper initState =
     let nextStep = bfsStep initState
     in (if isFinished nextStep then nextStep else bfsHelper nextStep)
 
 -----------------------------------------------------------------------------
 
-bfsFromGoal :: (DiGraph dg , Eq a) => dg -> Vertex a -> Vertex a -> BFSResult a
+bfsFromGoal :: (DiGraph dg a , Eq a) => dg -> Vertex a -> Vertex a -> SearchResult a
 bfsFromGoal g fin initV = fromBFS $ bfsHelper $ fromGoal g fin initV
 
-bfsFromPredicate :: (DiGraph dg) => dg -> (Vertex a -> Bool) -> Vertex a -> BFSResult a
+bfsFromPredicate :: (DiGraph dg a, Eq a) => dg -> (Vertex a -> Bool) -> Vertex a -> SearchResult a
 bfsFromPredicate g fin initV = fromBFS $ bfsHelper $ fromPredicate g fin initV

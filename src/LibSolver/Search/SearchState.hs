@@ -1,5 +1,5 @@
 module LibSolver.Search.SearchState
-    ( SearchState
+    ( SearchState(produce)
     ) where
 
 -- Типаж представителя пространства состояний

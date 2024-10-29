@@ -8,8 +8,6 @@ module LibSolver.DiGraph
 
 import LibSolver.Vertex (Vertex(..))
 
-class DiGraph dg where
-    -- Список вершин (вычисление допускает расхождение)
-    giVertices :: dg -> [Vertex a]
+class DiGraph dg a where
     -- Список смежных вершин (вычисление допускает расхождение)
     giVertexNeighbors :: dg -> Vertex a -> [Vertex a]

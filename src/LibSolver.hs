@@ -2,9 +2,7 @@
 
 module LibSolver
     ( module LibSolver.BoolExpr
-    , module LibSolver.Constraint
     , module LibSolver.DiGraph
-    , module LibSolver.Executor
     , module LibSolver.Graph
     , module LibSolver.Proposition
     , module LibSolver.SAT
@@ -14,9 +12,7 @@ module LibSolver
     ) where
 
 import LibSolver.BoolExpr
-import LibSolver.Constraint
 import LibSolver.DiGraph
-import LibSolver.Executor
 import LibSolver.Graph
 import LibSolver.Proposition
 import LibSolver.SAT

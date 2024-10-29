@@ -21,3 +21,4 @@ data Vertex a where
 
 deriving instance Show a => Show (Vertex a)
 deriving instance Eq a => Eq (Vertex a)
+deriving instance Ord a => Ord (Vertex a)
