@@ -102,6 +102,23 @@ executable eight-queens
     hs-source-dirs:   examples/EightQueens
     default-language: GHC2021
 
+executable eight-rooks
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:
+          base ^>=4.17.2.1
+        , j4fsolver
+        , containers
+        , split
+        , relude
+        , transformers
+        , prettyprinter
+        , lens
+        , template-haskell
+
+    hs-source-dirs:   examples/EightRooks
+    default-language: GHC2021
+
 test-suite j4fsolver-test
     import:           warnings
     default-language: GHC2021

@@ -22,15 +22,16 @@ newtype Board = Board Placement
 type Placement = [(Int, Int)]
 
 taskSize :: Int
-taskSize = 5
+taskSize = 4
 
 -----------------------------------------------------------------------------
 
--- Реализация интерфейса решателя
+-- Реализация интерфейса решателя (
+-- * без оптимизаций: проверяет строки, столбцы и диагонали для всех расположений фигур
 
 instance SearchState Placement where
     produce :: Placement -> [Placement]
-    produce p = [getNext p]
+    produce = getNext
 
 initPlacement :: Placement
 initPlacement = map (, 0) [0..taskSize]
@@ -39,7 +40,7 @@ initVertex :: Vertex Placement
 initVertex = Vertex { vertexState=initPlacement, vertexLabel="init"::Text }
 
 isFinal :: Placement -> Bool
-isFinal p = not (hasSameFstIndex p) && not (hasSameSndIndex p)
+isFinal p = not (hasSameFstIndex p) && not (hasSameSndIndex p) && not (hasSameDiagonal p)
 
 isFinalVertex :: Vertex Placement -> Bool
 isFinalVertex (Vertex { vertexState=p }) = isFinal p
@@ -58,18 +59,89 @@ hasSameSndIndex s =
     let xs = map snd s
     in hasDuplicates xs
 
--- Могут быть различные способы генерации всевозможных вариантов!
-getNext :: Placement -> Placement
-getNext [] = []
-getNext [(x, y)] = if y < taskSize then [(x, y + 1)] else [(x, y)]
-getNext ((x, y):s) = if y < taskSize then (x, y + 1):s else (x, 0):getNext s
+hasSameDiagonalHelper :: (Int, Int) -> [(Int, Int)] -> Bool
+hasSameDiagonalHelper _ [] = False
+hasSameDiagonalHelper (x1, y1) ((x2, y2):_) | abs (x1 - x2) == abs (y1 - y2) = True
+hasSameDiagonalHelper x1 (_:xs) = hasSameDiagonalHelper x1 xs
+
+hasSameDiagonal :: Placement -> Bool
+hasSameDiagonal [] = False
+hasSameDiagonal (x:xs) = hasSameDiagonalHelper x xs || hasSameDiagonal xs
+
+-- | Get next dummy approach
+-- 
+-- +-+-+-+    +-+-+-+
+-- |x| | |    | |x| |
+-- +-+-+-+    +-+-+-+
+-- |x| | | -> |x| | |
+-- +-+-+-+    +-+-+-+
+-- |x| | |    |x| | |
+-- +-+-+-+    +-+-+-+
+
+getNextDummyHelper :: Placement -> Placement
+getNextDummyHelper [] = []
+getNextDummyHelper [(x, y)] = 
+    if y < taskSize 
+    then [(x, y + 1)] 
+    else [(x, y)]
+getNextDummyHelper ((x, y):s) = 
+    if y < taskSize 
+    then (x, y + 1):s 
+    else (x, 0):getNextDummyHelper s
+
+getNextDummy :: Placement -> [Placement]
+getNextDummy ps = [getNextDummyHelper ps]
+
+-- | Get next
+--
+-- 1)
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- |x|x|x|    | |x|x|   |x| |x|   |x|x| |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | | | | -> |x| | | & | |x| | & | | |x|
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | | | |    | | | |   | | | |   | | | |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+--
+-- 2)
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | |x|x|    | |x|x|   | | |x|   | |x| |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- |x| | | -> | | | | & |x|x| | & |x| |x|
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | | | |    |x| | |   | | | |   | | | |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+--
+-- 3)
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | |x|x|    | |x|x|   | | |x|   | |x| |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- | | | | -> | | | | & | |x| | & | | |x|
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+-- |x| | |    |x| | |   |x| | |   |x| | |
+-- +-+-+-+    +-+-+-+   +-+-+-+   +-+-+-+
+
+getNextHelper :: Placement -> (Int, Int) -> Placement
+getNextHelper [] _ = []
+getNextHelper [(px, py)]   (cx, cy) | (px, py) == (cx, cy) = 
+    if py < taskSize 
+    then [(px, py + 1)]  
+    else [(px, py)]
+getNextHelper p@((px, py):s) (cx, cy) | (px, py) == (cx, cy) = 
+    if py < taskSize 
+    then  (px, py + 1):s 
+    else p
+getNextHelper ((px, py):s) c = (px, py) : getNextHelper s c
+
+getNext :: Placement -> [Placement]
+getNext p = map (getNextHelper p) p
 
 instance DiGraph Board Placement where
     giVertexNeighbors :: Board -> Vertex Placement -> [Vertex Placement]
-    giVertexNeighbors _br (Vertex { vertexState=p }) = [Vertex
-        { vertexState=getNext p
+    giVertexNeighbors _br (Vertex { vertexState=p }) = map (\c -> Vertex
+        { vertexState=c
         , vertexLabel="test"::Text
-        }]
+        }) (produce p)
 
 -----------------------------------------------------------------------------
 

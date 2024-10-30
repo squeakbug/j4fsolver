@@ -105,7 +105,7 @@ bfsStep BFS
 bfsStep BFS
     { graph=g
     , isFinal=isFinal
-    , queue=(v:f)
+    , queue=queue@(v:f)
     , seen=seen
     , path=path
     , isFinished=_
@@ -118,7 +118,7 @@ bfsStep BFS
     , isFinished=False
     }
     where vNeighbours = giVertexNeighbors g v
-          notSeenNeighbours = filterVertexNeighbors seen vNeighbours
+          notSeenNeighbours = filterVertexNeighbors queue $ filterVertexNeighbors seen vNeighbours
           queue' = f ++ notSeenNeighbours
           seen' = v : seen
           path' = v : path
