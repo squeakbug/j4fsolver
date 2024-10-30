@@ -67,6 +67,7 @@ library
         , transformers
 
     hs-source-dirs:   src
+    ghc-options:      -Wall -O3
     default-language: GHC2021
 
 executable simple-search
@@ -83,6 +84,7 @@ executable simple-search
         , template-haskell
 
     hs-source-dirs:   examples/SimpleSearch
+    ghc-options:      -Wall -O3
     default-language: GHC2021
 
 executable eight-queens
@@ -100,6 +102,7 @@ executable eight-queens
         , template-haskell
 
     hs-source-dirs:   examples/EightQueens
+    ghc-options:      -Wall -O3
     default-language: GHC2021
 
 executable eight-rooks
@@ -117,6 +120,7 @@ executable eight-rooks
         , template-haskell
 
     hs-source-dirs:   examples/EightRooks
+    ghc-options:      -Wall -O3
     default-language: GHC2021
 
 test-suite j4fsolver-test

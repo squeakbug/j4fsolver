@@ -49,11 +49,10 @@ fromDFS DFS
     }
 
 fromDFS DFS
-    { path=_
-    , seen=seen
+    { path=path
     , stack=[]
     } = SearchResult
-    { finalPath = seen
+    { finalPath = path
     , finalVertex = Nothing
     , isFinded = False
     }
@@ -68,50 +67,29 @@ filterVertexNeighbors s vn = filter (`notElem` s) vn
 
 -- Стек пуст, а вершина не найдена -> заканчиваем поиск
 dfsStep :: (DiGraph dg a, Eq a) => DFS dg a -> DFS dg a
-dfsStep DFS
-    { graph=g
-    , isFinal=isFinal
-    , stack=[]
-    , seen=seen
-    , path=path
-    , isFinished=_
-    } = DFS
-    { graph=g
-    , isFinal=isFinal
-    , stack=[]
-    , seen=seen
-    , path=path
-    , isFinished=True
+dfsStep d@DFS
+    { stack=[]
+    } = d
+    { isFinished=True
     }
 
 -- Искомая вершина найдена
-dfsStep DFS
-    { graph=g
-    , isFinal=isFinal
-    , stack=stack@(v:_)
-    , seen=seen
-    , path=path
-    , isFinished=_
-    } | isFinal v = DFS
-    { graph=g
-    , isFinal=isFinal
-    , stack=stack
-    , seen=seen
-    , path=path
+dfsStep d@DFS
+    { isFinal=isFinal
+    , stack=(v:_)
+    } | isFinal v = d
+    { isFinal=isFinal
     , isFinished=True
     }
 
 -- Иначе, если в очереди остались вершины
-dfsStep DFS
+dfsStep d@DFS
     { graph=g
-    , isFinal=isFinal
     , stack=(v:f)
     , seen=seen
     , path=path
-    , isFinished=_
-    } = DFS
+    } = d
     { graph=g
-    , isFinal=isFinal
     , stack=stack'
     , seen=seen'
     , path=path'

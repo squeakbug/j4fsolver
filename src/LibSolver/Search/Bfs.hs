@@ -49,11 +49,10 @@ fromBFS BFS
     }
 
 fromBFS BFS
-    { path=_
-    , seen=seen
+    { path=path
     , queue=[]
     } = SearchResult
-    { finalPath = seen
+    { finalPath = path
     , finalVertex = Nothing
     , isFinded = False
     }
@@ -68,51 +67,29 @@ filterVertexNeighbors s vn = filter (`notElem` s) vn
 
 -- Очередь пуста, а вершина не найдена -> заканчиваем поиск
 bfsStep :: (DiGraph dg a, Eq a) => BFS dg a -> BFS dg a
-bfsStep BFS
-    { graph=g
-    , isFinal=isFinal
-    , queue=[]
-    , seen=seen
-    , path=path
-    , isFinished=_
-    } = BFS
-    { graph=g
-    , isFinal=isFinal
-    , queue=[]
-    , seen=seen
-    , path=path
-    , isFinished=True
+bfsStep b@BFS
+    { queue=[]
+    } = b
+    { isFinished=True
     }
 
 -- Искомая вершина найдена
-bfsStep BFS
-    { graph=g
-    , isFinal=isFinal
+bfsStep b@BFS
+    { isFinal=isFinal
     , queue=queue@(v:_)
-    , seen=seen
-    , path=path
-    , isFinished=_
-    } | isFinal v = BFS
-    { graph=g
-    , isFinal=isFinal
-    , queue=queue
-    , seen=seen
-    , path=path
+    } | isFinal v = b
+    { queue=queue
     , isFinished=True
     }
 
 -- Иначе, если в очереди остались вершины
-bfsStep BFS
+bfsStep b@BFS
     { graph=g
-    , isFinal=isFinal
     , queue=queue@(v:f)
     , seen=seen
     , path=path
-    , isFinished=_
-    } = BFS
-    { graph=g
-    , isFinal=isFinal
-    , queue=queue'
+    } = b
+    { queue=queue'
     , seen=seen'
     , path=path'
     , isFinished=False

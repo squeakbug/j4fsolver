@@ -22,7 +22,7 @@ newtype Board = Board Placement
 type Placement = [(Int, Int)]
 
 taskSize :: Int
-taskSize = 4
+taskSize = 5
 
 -----------------------------------------------------------------------------
 
