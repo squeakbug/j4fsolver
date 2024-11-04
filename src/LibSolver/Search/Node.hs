@@ -2,9 +2,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving  #-}
 
-module LibSolver.Vertex 
-    ( Vertex(..)
-    , VertexLabel
+module LibSolver.Search.Node
+    ( 
     ) where
 
 import Data.Text (Text)

@@ -88,7 +88,7 @@ literals _ = Set.empty
 
 -----------------------------------------------------------------------------
 
--- Заменяет все вхождения переменной var на val
+-- Заменяет все вхождения переменной var на значение val
 guessVariable :: Boolean a => Text -> a -> BoolExpr a -> BoolExpr a
 guessVariable var val e =
   case e of
@@ -106,16 +106,45 @@ guessVariable var val e =
 
 -----------------------------------------------------------------------------
 
-simplify :: (Boolean a) => BoolExpr a -> BoolExpr a
-simplify (Const b) = Const b
-simplify (Var v) = Var v
-simplify (Not e) =
-  case simplify e of
+-- Операции упрощения
+
+-- Удаление двойных отрицаний
+-- (Not (Not (Var a))) -> Var a
+fixNegations :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixNegations expr =
+  case expr of
+    -- Удаление двойного отрицания
+    Not (Not x) -> fixNegations x
+
+    Not (Const b) -> Const (bNot b)
+
+    Not x -> Not (fixNegations x)
+    And x y -> And (fixNegations x) (fixNegations y)
+    Or x y -> Or (fixNegations x) (fixNegations y)
+    x -> x
+
+-- Закон исключения третьего
+fixThird :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixThird expr =
+  case expr of
+    And (Var x) (Not (Var y)) | x == y -> (Const bFalse)
+    And (Not (Var x)) (Var y) | x == y -> (Const bFalse)
+    Or (Var x) (Not (Var y)) | x == y -> (Const bTrue)
+    Or (Not (Var x)) (Var y) | x == y -> (Const bTrue)
+
+-- Упрощает операции с константами:
+-- (Var A) /\ (Const False) -> (Const False)
+-- (Var A) \/ (Const True)  -> (Const True)
+fixConstOps :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixConstOps (Const b) = Const b
+fixConstOps (Var v) = Var v
+fixConstOps (Not e) =
+  case fixConstOps e of
     Const b' -> Const (bNot b')
     e' -> Not e'
 
-simplify (Or x y) =
-  let es = filter (/= Const bFalse) [simplify x, simplify y]
+fixConstOps (Or x y) =
+  let es = filter (/= Const bFalse) [fixConstOps x, fixConstOps y]
   in
     if Const bTrue `elem` es
     then Const bTrue
@@ -126,8 +155,8 @@ simplify (Or x y) =
         [e1, e2] -> Or e1 e2
         _ -> error "Unreachable"
 
-simplify (And x y) =
-  let es = filter (/= Const bTrue) [simplify x, simplify y]
+fixConstOps (And x y) =
+  let es = filter (/= Const bTrue) [fixConstOps x, fixConstOps y]
   in
     if Const bFalse `elem` es
     then Const bFalse
@@ -138,27 +167,18 @@ simplify (And x y) =
         [e1, e2] -> And e1 e2
         _ -> error "Unreachable"
 
-simplify _ = error "Not implemented"
+fixConstOps _ = error "Not implemented"
 
--- Удаление двойных отрицаний
-fixNegations :: (Boolean a) => BoolExpr a -> BoolExpr a
-fixNegations expr =
-  case expr of
-    -- Удаление двойного отрицания
-    Not (Not x) -> fixNegations x
+-- Повторения
+fixRepeats :: Boolean a => BoolExpr a -> BoolExpr a
+fixRepeats (Var v) = (Var v)
+fixRepeats (Not e) = Not (fixRepeats e)
+fixRepeats (Or (Var x) (Var y)) | x == y = Var x
+fixRepeats (Or x y) = Or (fixRepeats x) (fixRepeats y)
+fixRepeats (And (Var x) (Var y)) | x == y = Var x
+fixRepeats (And x y) = And (fixRepeats x) (fixRepeats y)
 
-    -- Закон Де Моргана
-    Not (And x y) -> Or (fixNegations $ Not x) (fixNegations $ Not y)
-    Not (Or x y) -> And (fixNegations $ Not x) (fixNegations $ Not y)
-
-    Not (Const b) -> Const (bNot b)
-
-    Not x -> Not (fixNegations x)
-    And x y -> And (fixNegations x) (fixNegations y)
-    Or x y -> Or (fixNegations x) (fixNegations y)
-    x -> x
-
--- Закон дистрибутивности для булевого кольца
+-- Распределительный закон для булевого кольца
 -- Например, A /\ (B \/ C) -> (A \/ B) /\ (A \/ C)
 distribute :: Boolean a => BoolExpr a -> BoolExpr a
 distribute expr =
@@ -175,20 +195,15 @@ distribute expr =
     Not x -> Not (distribute x)
     x -> x
 
--- Приведение к КНФ
-cnf :: (Boolean a) => BoolExpr a -> BoolExpr a
-cnf expr =
-  if updated == expr
-  then expr
-  else cnf updated
+-- Закон Де Моргана
+fixDeMorgan :: Boolean a => BoolExpr a -> BoolExpr a
+fixDeMorgan expr =
+  case expr of
+    Not (And x y) -> Or (fixNegations $ Not x) (fixNegations $ Not y)
+    Not (Or x y) -> And (fixNegations $ Not x) (fixNegations $ Not y)
+    x -> x
 
-  where
-    updated = distribute (fixNegations expr)
-
-negatePolarity :: Polarity -> Polarity
-negatePolarity Positive = Negative
-negatePolarity Negative = Positive
-negatePolarity Mixed = Mixed
+-----------------------------------------------------------------------------
 
 -- Determine whether a literal has a polarity.
 -- Return Nothing if the literal doesn't appear in the expression.
@@ -241,29 +256,9 @@ literalElimination e =
       replaceAll = foldl (.) id replacers
   in replaceAll e
 
------------------------------------------------------------------------------
-
--- Для выражения в КНФ
-
 -- Определение, состоит ли выражение из одной переменной
 -- Если да, то функция принимает значение (имя переменной, ее "полярность");.
 unitClause :: (Boolean a) => BoolExpr a -> Maybe (Text, a)
 unitClause (Var v) = Just (v, bTrue)
 unitClause (Not (Var v)) = Just (v, bFalse)
 unitClause _ = Nothing
-
--- Префиксный обход графа
-clauses :: Boolean a => BoolExpr a -> [BoolExpr a]
-clauses (And x y) = clauses x ++ clauses y
-clauses expr = [expr]
-
--- Выделить все выражения, состоящие из одной переменной
-allUnitClauses :: (Boolean a) => BoolExpr a -> [(Text, a)]
-allUnitClauses = mapMaybe unitClause . clauses
-
-unitPropagation :: (Boolean a) => BoolExpr a -> BoolExpr a
-unitPropagation expr = replaceAll expr
-  where
-    assignments = allUnitClauses expr
-
-    replaceAll = foldl (.) id (map (uncurry guessVariable) assignments)

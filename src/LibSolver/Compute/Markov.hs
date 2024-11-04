@@ -1,4 +1,4 @@
-module LibSolver.Executor where
+module LibSolver.Compute.Markov where
 
 import Data.List
 

@@ -1,14 +1,6 @@
 module LibSolver.Search
-    ( SearchResult(..)
+    (
     ) where
-
-import LibSolver.Vertex (Vertex)
-
-data SearchResult a = SearchResult
-    { finalPath    :: [Vertex a]       -- Путь от корня до цели
-    , finalVertex  :: Maybe (Vertex a) -- Конечная вершина
-    , isFinded     :: Bool             -- Была ли найдена вершина
-    } deriving (Show)
 
 ---------------------------------------------------------------------------------
 

@@ -76,7 +76,7 @@ cabal test
 
 ### Logic unification and reduction 
 
-* 
+* https://github.com/creusot-rs/creusot
 
 ### Category theory
 
@@ -88,6 +88,8 @@ cabal test
 - [SMT-LIB](https://smt-lib.org/)
 - [bitwuzla](https://bitwuzla.github.io/)
 - [lean4](https://github.com/leanprover/lean4)
+- https://github.com/leanprover-community/mathlib4
+- https://github.com/sarsko/CreuSAT
 
 - [Реализация DPLL и BF sat-решателей](https://www.gibiansky.com/blog/verification/writing-a-sat-solver/index.html)
 

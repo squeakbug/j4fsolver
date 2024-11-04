@@ -2,11 +2,9 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving  #-}
 
-module LibSolver.DiGraph 
-    ( DiGraph(..)
+module LibSolver.Search.Problem
+    ( 
     ) where
-
-import LibSolver.Vertex (Vertex(..))
 
 -- |Тип, используемый для представления стоимости, связанной с определенным путем.
 type Cost = Double

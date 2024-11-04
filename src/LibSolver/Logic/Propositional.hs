@@ -5,34 +5,122 @@ module LibSolver.Logic.Propositional
     , bfsFromGoal
     , bfsFromPredicate
     ) where
-import LibSolver.Search.Bfs (bfsFromPredicate)
 
--- |A KB for propositional logic. Inefficient, with no indexing.
-class KB k => PropKB k:
-    def __init__(self, sentence=None):
-        super().__init__(sentence)
-        self.clauses = []
+import LibSolver.BoolExpr 
 
-    def tell(self, sentence):
-        """Add the sentence's clauses to the KB."""
-        self.clauses.extend(conjuncts(to_cnf(sentence)))
+-----------------------------------------------------------------------------
 
-    def ask_generator(self, query):
-        """Yield the empty substitution {} if KB entails query; else no results."""
-        if tt_entails(Expr('&', *self.clauses), query):
-            yield {}
+-- |A simple knowledge base for propositional logic. We keep a list of known
+--  propositions (the axioms) to be used as an inference base.
+data PropKB p t = PropKB [BoolExpr]
 
-    def ask_if_true(self, query):
-        """Return True if the KB entails query, else return False."""
-        for _ in self.ask_generator(query):
-            return True
-        return False
+-- |Экземпляр типажа базы знаний в пропозиционной логике. 
+--   Для разрешения используется функция 'plResolution'.
+instance KB PropKB PLExpr Bool where
+    empty                  = PropKB []
+    tell     (PropKB ps) p = PropKB $ ps ++ conjuncts (toCnf p)
+    retract  (PropKB ps) p = PropKB $ L.delete p ps
+    ask      (PropKB ps) p = plResolution (And ps) p
+    askVars                = undefined
+    axioms   (PropKB ps)   = ps
 
-    def retract(self, sentence):
-        """Remove the sentence's clauses from the KB."""
-        for c in conjuncts(to_cnf(sentence)):
-            if c in self.clauses:
-                self.clauses.remove(c)
+-----------------------------------------------------------------------------
+
+plResolution :: BoolExpr -> BoolExpr -> Bool
+plResolution s t = go $ conjuncts $ toCnf $ And [s, Not t]
+    where
+        go clauses = if contradictionDerived
+            then True
+            else if new `isSubSet` clauses
+                then False
+                else go (L.union clauses new)
+
+            where
+                (contradictionDerived, new) =
+                    foldr resolve (False, []) (unorderedPairs clauses)
+
+        resolve (_,_) (True, new)  = (True, new)
+        resolve (x,y) (False, new) = if false `elem` resolvents
+            then (True, new)
+            else (False, L.union new resolvents)
+            where
+                resolvents = plResolve x y
+
+-- |Return the set of all possible clauses obtained by resolving the two inputs.
+plResolve :: PLExpr -> PLExpr -> [PLExpr]
+plResolve p q =
+    filter (not . isTautology) [resolve x y | x <- ps, y <- qs, complementary x y]
+    where
+        ps = disjuncts p
+        qs = disjuncts q
+
+        resolve x y = case L.union (L.delete x ps) (L.delete y qs) of
+            [] -> Val False
+            xs -> Or xs
+
+
+----------------------
+-- Definite Clauses --
+----------------------
+
+type Symbol = String
+
+data DefiniteClause = DefiniteClause { premises :: [Symbol]
+                                     , conclusion :: Symbol } deriving (Eq,Ord)
+
+instance Show DefiniteClause where
+    show (DefiniteClause []   hd) = hd 
+    show (DefiniteClause body hd) =
+        (concat $ L.intersperse " & " body) ++ " => " ++ hd
+
+toDefiniteClause :: PLExpr -> ThrowsError DefiniteClause
+toDefiniteClause (Val x) = return $ DefiniteClause [] (show x)
+toDefiniteClause (Var x) = return $ DefiniteClause [] x
+toDefiniteClause (p `Implies` q) = if all isAtom xs && isAtom q
+    then return $ DefiniteClause (map toSym xs) (toSym q)
+    else throwError InvalidExpression
+        where xs = conjuncts p
+toDefiniteClause _ = throwError InvalidExpression
+
+toSym :: PLExpr -> Symbol
+toSym (Val x) = show x
+toSym (Var x) = x
+toSym _       = error "Not an atom -- AI.Logic.Propositional.toSym"
+
+isFact :: DefiniteClause -> Bool
+isFact (DefiniteClause [] _) = True
+isFact _                     = False
+
+facts :: [DefiniteClause] -> [String]
+facts = map conclusion . filter isFact
+
+----------------------
+-- Forward Chaining --
+----------------------
+
+fcEntails :: [DefiniteClause] -> Symbol -> Bool
+fcEntails kb q = go initialCount [] (facts kb)
+    where
+        go count inferred []     = False
+        go count inferred (p:ps) = if p == q
+            then True
+            else if p `elem` inferred
+                    then go count inferred ps
+                    else go count' (p:inferred) agenda'
+                        where (count', agenda') = run kb p count ps
+
+        run []     p count agenda = (count, agenda)
+        run (c:cs) p count agenda = if not (p `elem` premises c)
+            then run cs p count agenda
+            else if n == 1
+                    then run cs p count' (conclusion c:agenda)
+                    else run cs p count' agenda
+            where
+                n    = count ! c
+                count' = M.insert c (n-1) count
+
+        initialCount = foldr f M.empty kb
+            where f c count = M.insert c (length $ premises c) count
 
 -----------------------------------------------------------------------------
 

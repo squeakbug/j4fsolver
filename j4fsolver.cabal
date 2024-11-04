@@ -27,25 +27,55 @@ library
     import:           warnings
     exposed-modules:  
         LibSolver
+        LibSolver.Agent
+        LibSolver.Agent.ModelBasedReflex
+        LibSolver.Agent.SimpleReflex
         LibSolver.BoolExpr
-        LibSolver.Constraint
-        LibSolver.DiGraph
-        LibSolver.DiGraph.Vertices
-        LibSolver.Executor
-        LibSolver.Graph
-        LibSolver.Proposition
-        LibSolver.Proposition.Forward
-        LibSolver.Proposition.Backward
+        LibSolver.BoolExpr.Circuit
+        LibSolver.BoolExpr.CNF
+        LibSolver.BoolExpr.DNF
+        LibSolver.BoolExpr.Parser
+        LibSolver.BoolExpr.Printer
+        LibSolver.BoolExpr.SemiRing
+        LibSolver.Compute
+        LibSolver.Compute.Lambda
+        LibSolver.Compute.LambdaTyped
+        LibSolver.Compute.Markov
+        LibSolver.Compute.Turing
+        LibSolver.CSP
+        LibSolver.CSP.A3
+        LibSolver.CSP.Backtracking
+        LibSolver.Logic
+        LibSolver.Logic.Combinatorial
+        LibSolver.Logic.DefClause
+        LibSolver.Logic.FirstOrder
+        LibSolver.Logic.Modal
+        LibSolver.Logic.Propositional
+        LibSolver.Logic.Temporal
+        LibSolver.Logic.ThreeValued
+        LibSolver.Logic.TruthTable
+        LibSolver.Planning
+        LibSolver.Planning.PlanningProblem
         LibSolver.SAT
+        LibSolver.SAT.Brootforce
+        LibSolver.SAT.DPLL
+        LibSolver.SAT.Reta
+        LibSolver.SAT.WalkSAT
         LibSolver.Search
         LibSolver.Search.AStar
         LibSolver.Search.Bfs
+        LibSolver.Search.BranchAndBound
         LibSolver.Search.Dfs
+        LibSolver.Search.Dijkstra
         LibSolver.Search.Heuristic
         LibSolver.Search.InfoSearch
-        LibSolver.Search.SearchState
-        LibSolver.SemiRing
-        LibSolver.Vertex
+        LibSolver.Search.Node
+        LibSolver.Search.Problem
+        LibSolver.Types
+        LibSolver.Types.Arc
+        LibSolver.Types.Functional
+        LibSolver.Types.Parser
+        LibSolver.Types.Vertices
 
     build-depends:
           base ^>=4.17.2.1
@@ -65,6 +95,7 @@ library
         , split
         , template-haskell
         , transformers
+        , tagged
 
     hs-source-dirs:   src
     ghc-options:      -Wall -O3

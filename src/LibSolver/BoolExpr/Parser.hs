@@ -13,25 +13,11 @@ module LibSolver.BoolExpr.Parser
 where
 
 import Control.Monad
-import Data.BoolExpr
 import Text.ParserCombinators.Parsec
 import qualified Text.ParserCombinators.Parsec.Token as P
 
-{- | Parse a search query as a boolean tree using the following grammar.
-     Note that this parser is parameterized over the parser of query simple
-     terms (const).
+import LibSolver.BoolExpr
 
-@
-  bt ::= bt AND bt
-        | bt bt -- same as AND
-        | bt OR bt
-        | - bt
-        | NOT bt
-        | ( bt )
-        | const
-   const ::= \<given as argument\>
-@
--}
 parseBoolExpr :: CharParser st a -> CharParser st (BoolExpr a)
 parseBoolExpr parseConst = disj
    where disj   = conj   `chainl1` orOp

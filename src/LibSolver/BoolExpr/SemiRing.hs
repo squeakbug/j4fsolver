@@ -1,4 +1,4 @@
-module LibSolver.SemiRing where
+module LibSolver.BoolExpr.SemiRing where
 
 import Data.Set (Set)
 

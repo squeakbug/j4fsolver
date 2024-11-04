@@ -1,24 +1,26 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module LibSolver
-    ( module LibSolver.BoolExpr
-    , module LibSolver.DiGraph
-    , module LibSolver.Graph
-    , module LibSolver.Proposition
+    ( module LibSolver.Agent
+    , module LibSolver.BoolExpr
+    , module LibSolver.Compute
+    , module LibSolver.CSP
+    , module LibSolver.Logic
+    , module LibSolver.Planning
     , module LibSolver.SAT
     , module LibSolver.Search
-    , module LibSolver.SemiRing
-    , module LibSolver.Vertex
+    , module LibSolver.Types
     ) where
 
+import LibSolver.Agent
 import LibSolver.BoolExpr
-import LibSolver.DiGraph
-import LibSolver.Graph
-import LibSolver.Proposition
+import LibSolver.Compute
+import LibSolver.CSP
+import LibSolver.Logic
+import LibSolver.Planning
 import LibSolver.SAT
 import LibSolver.Search
-import LibSolver.SemiRing
-import LibSolver.Vertex
+import LibSolver.Types
 
 -- Как эффективно представлять пространства состояний (например, игровую карту)?
 

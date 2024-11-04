@@ -1,3 +1,3 @@
-module LibSolver.SimpleReflex where
+module LibSolver.Agent.SimpleReflex where
 
  

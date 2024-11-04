@@ -1,4 +1,4 @@
-module LibSolver.Proposition where
+module LibSolver.Logic where
 
 import Data.Set (Set)
 import Data.Text (Text)
@@ -6,6 +6,8 @@ import Data.Text (Text)
 import LibSolver.BoolExpr
 
 -- |База знаний
+--  p - тип правила
+--  t - тип таблицы (определяет процедуру поиска, разрешения, добавления и удаления правил)
 class (Expr p, Show t) => KB k p t where
     -- | Пустая база знаний
     empty :: k p t

@@ -1,2 +1,2 @@
-module LibSolver.Executor where
+module LibSolver.Compute.Lambda where
 
