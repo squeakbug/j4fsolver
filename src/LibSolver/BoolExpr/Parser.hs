@@ -12,11 +12,40 @@ module LibSolver.BoolExpr.Parser
   )
 where
 
+import Data.Text (Text)
+import Data.Void
+
+import Control.Applicative
 import Control.Monad
-import Text.ParserCombinators.Parsec
-import qualified Text.ParserCombinators.Parsec.Token as P
+
+import Text.Megaparsec hiding (State)
+import Text.Megaparsec.Char
+import qualified Data.Text as T
+import qualified Text.Megaparsec.Char.Lexer as L
 
 import LibSolver.BoolExpr
+
+type Parser = Parsec Void Text
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme sc
+
+symbol :: Text -> Parser Text
+symbol = L.symbol sc
+
+pVariable :: Parser BoolExpr
+pVariable = Var <$> lexeme
+  ((:) <$> letterChar <*> many alphaNumChar <?> "variable")
+
+parens :: Parser a -> Parser a
+parens = between (symbol "(") (symbol ")")
+
+pTerm :: Parser Expr
+pTerm = choice
+  [ parens pExpr
+  , pVariable
+  , pInteger
+  ]
 
 parseBoolExpr :: CharParser st a -> CharParser st (BoolExpr a)
 parseBoolExpr parseConst = disj
@@ -33,46 +62,3 @@ parseBoolExpr parseConst = disj
 
          andOp = BAnd <$ option "" (symbol "AND")
          orOp  = BOr <$ symbol "OR"
-
--- | Underlying lexer of 'languageDef'
-lexer :: P.TokenParser st
-lexer = P.makeTokenParser languageDef
-
--- | Shorthand for 'P.parens lexer'.
-parens :: CharParser st a -> CharParser st a
-parens = P.parens lexer
-
--- | Shorthand for 'P.symbol' 'lexer'.
-symbol :: String -> CharParser st String
-symbol = P.symbol lexer
-
--- | Shorthand for 'P.whiteSpace' 'lexer'.
-whiteSpace :: CharParser st ()
-whiteSpace = P.whiteSpace lexer
-
--- | Shorthand for 'P.identifier' 'lexer'.
-identifier :: CharParser st String
-identifier = do
-    str <- P.identifier lexer
-    pure str
-
-wordLetter :: CharParser st Char
-wordLetter = alphaNum <|> oneOf "_:;`,~@.!#$%^&*=+?|\\{}[]<>"
-
--- | Basic language definition for search queries.
--- Reserved names are @\"AND\"@ @\"OR\"@ and @\"-\"@.
--- Identifiers accepts almost every ASCII sequences without blanks nor @\'-\'@.
-languageDef :: P.LanguageDef st
-languageDef = P.LanguageDef
-               { P.commentStart   = ""
-               , P.commentEnd     = ""
-               , P.commentLine    = ""
-               , P.nestedComments = True
-               , P.identStart     = wordLetter
-               , P.identLetter    = wordLetter <|> char '-'
-               , P.opStart        = mzero
-               , P.opLetter       = mzero
-               , P.reservedOpNames= []
-               , P.reservedNames  = ["AND", "OR", "-"]
-               , P.caseSensitive  = True
-               }

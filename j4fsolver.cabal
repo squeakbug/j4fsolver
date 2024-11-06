@@ -72,10 +72,11 @@ library
         LibSolver.Search.Node
         LibSolver.Search.Problem
         LibSolver.Types
-        LibSolver.Types.Arc
-        LibSolver.Types.Functional
-        LibSolver.Types.Parser
-        LibSolver.Types.Vertices
+        LibSolver.Types.Graph
+        LibSolver.Types.ProbDist
+        LibSolver.Types.Queue
+        LibSolver.Types.Table
+        LibSolver.Types.WeightedGraph
 
     build-depends:
           base ^>=4.17.2.1
@@ -87,6 +88,7 @@ library
         
         , aeson
         , megaparsec
+        , parser-combinators
         , utf8-string
 
         , graphviz
