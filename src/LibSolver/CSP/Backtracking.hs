@@ -1,3 +1,3 @@
-module LibSolver.CSP.Backtracking where
+module LibSolver.CSP.Backtracking
     (
     ) where

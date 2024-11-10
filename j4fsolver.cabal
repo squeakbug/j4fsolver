@@ -77,27 +77,38 @@ library
         LibSolver.Types.Queue
         LibSolver.Types.Table
         LibSolver.Types.WeightedGraph
+        LibSolver.Util
 
     build-depends:
+        -- Base
           base ^>=4.17.2.1
+        , relude
+        , split
 
+        -- Types
         , combinat
         , containers
         , psqueues
         , vector
+        , deepseq
+        , lens
+        , transformers
+        , mtl
+        , tagged
         
+        -- SerDes
         , aeson
         , megaparsec
         , parser-combinators
         , utf8-string
-
+        , prettyprinter
         , graphviz
-        , lens
-        , relude
-        , split
+
+        -- Other
+        , random
+        , MonadRandom
         , template-haskell
-        , transformers
-        , tagged
+        , stm
 
     hs-source-dirs:   src
     ghc-options:      -Wall -O3

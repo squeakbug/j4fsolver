@@ -1,14 +1,16 @@
 module LibSolver.Logic where
 
 import Data.Set (Set)
+import Data.Map (Map)
 import Data.Text (Text)
 
 import LibSolver.BoolExpr
 
--- |База знаний
---  p - тип правила
---  t - тип таблицы (определяет процедуру поиска, разрешения, добавления и удаления правил)
-class (Expr p, Show t) => KB k p t where
+-- | База знаний
+--   k - тип базы знаний (Таблица, граф, ...)
+--   p - тип правила (CNF, DNF, ...)
+--   t - внутренний тип (Haskell's Bool, User defined type with boolean ring properties, ...)
+class (Eq p, Show t) => KB k p t where
     -- | Пустая база знаний
     empty :: k p t
 
@@ -30,22 +32,3 @@ class (Expr p, Show t) => KB k p t where
     -- |Проверить, содержится ли правило в базе знаний
     contains :: k p t -> p -> Bool
     contains kb p = p `elem` axioms kb
-
------------------------------------------------------------------------------
-
-newtype PropositionForm a = PropositionForm
-    { expr :: BoolExpr a
-    }
-
-data PropositionRule a = PropositionRule
-    { antecedent :: [PropositionForm a] -- Предусловие
-    , consequent :: PropositionForm a   -- Следствие
-    }
-
-data Theory a = Theory
-    { vars   :: Set Text                -- Множество термов
-    , axioms :: Set (PropositionForm a) -- Аксиомы
-    , rules  :: Set (PropositionRule a) -- Правила вывода
-    }
-
-data Solver

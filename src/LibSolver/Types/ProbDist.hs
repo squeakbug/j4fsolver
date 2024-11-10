@@ -2,10 +2,7 @@
 
 module LibSolver.Types.ProbDist where
 
-import Control.Applicative
-import Control.Monad
-import Control.Monad.Random
-import Data.Map (Map)
+import Control.Monad.Random hiding (uniform, weighted)
 import GHC.Float
 
 import qualified Data.List as L
@@ -13,7 +10,7 @@ import qualified Data.Map as M
 
 type Prob = Float
 
-data Dist a = D { unD :: [(a,Prob)] }
+newtype Dist a = D { unD :: [(a,Prob)] }
 
 instance Functor Dist where
     fmap f (D xs) = D [ (f x,p) | (x,p) <- xs ]

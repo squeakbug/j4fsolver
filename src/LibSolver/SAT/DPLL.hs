@@ -1,15 +1,32 @@
+{-# LANGUAGE DataKinds #-}
+
 module LibSolver.SAT.DPLL where
+
+import LibSolver.BoolExpr
+  ( BoolExpr(..)
+  , BoolExprForm(CNF)
+  , simplify
+  , freeVariable
+  , guessVariable
+  , literalElimination
+  , Boolean (bTrue, bFalse, (\/))
+  )
+import LibSolver.BoolExpr.CNF (cnf, unitPropagation)
+
+unConst :: (Boolean a) => BoolExpr f a -> a
+unConst (Const b) = b
+unConst _ = error "Not Const"
 
 -- The only important thing that changed is the
 -- addition of the 'where' clause.
-satisfiable :: Expr -> Bool
+satisfiable :: (Boolean a) => BoolExpr CNF a -> a
 satisfiable expr =
   case freeVariable expr' of
     Nothing -> unConst $ simplify expr'
     Just v ->
-      let trueGuess  = simplify (guessVariable v True expr)
-          falseGuess = simplify (guessVariable v False expr)
-      in satisfiableDPLL trueGuess || satisfiableDPLL falseGuess
+      let trueGuess  = simplify (guessVariable v bTrue expr)
+          falseGuess = simplify (guessVariable v bFalse expr)
+      in satisfiable trueGuess \/ satisfiable falseGuess
 
   where
     -- Apply our backtracking search *after* literal elimination

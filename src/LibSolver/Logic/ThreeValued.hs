@@ -1,3 +1,3 @@
-module LibSolver.Logic.ThreeValued where
+module LibSolver.Logic.ThreeValued
     (
     ) where

@@ -1,4 +1,4 @@
-{-# LANGUAGE DatatypeContexts #-}
+{-# LANGUAGE DataKinds #-}
 
 module LibSolver.BoolExpr where
 
@@ -37,16 +37,23 @@ class BooleanFunc a where
 
 -----------------------------------------------------------------------------
 
-data (Boolean a) => BoolExpr a = Var Text
-          | And (BoolExpr a) (BoolExpr a)
-          | Or (BoolExpr a) (BoolExpr a)
-          | Not (BoolExpr a)
-          | Equal (BoolExpr a) (BoolExpr a)
-          | Impl (BoolExpr a) (BoolExpr a)
+-- Not safe. Try to use Data.Tagged
+-- CNF и DNF это не типы, это объекты множества
+--   * Их нельзя использовать в шаблонах, но в hs есть Datatype promotion
+data BoolExprForm = Undef | CNF | DNF
+
+-- | You can use Tagged package for specifing type, but
+--   it's will be debt
+data BoolExpr (f :: BoolExprForm) a = Var Text
+          | And (BoolExpr f a) (BoolExpr f a)
+          | Or (BoolExpr f a) (BoolExpr f a)
+          | Not (BoolExpr f a)
+          | Equal (BoolExpr f a) (BoolExpr f a)
+          | Impl (BoolExpr f a) (BoolExpr f a)
           | Const a
   deriving (Eq, Ord, Show, Read)
 
-instance Boolean a => BooleanFunc (BoolExpr a) where
+instance Boolean a => BooleanFunc (BoolExpr f a) where
   apply (Var text) args =
     case lookup text args of
       Just result -> result
@@ -66,8 +73,19 @@ data Polarity = Positive | Negative | Mixed
 
 -----------------------------------------------------------------------------
 
+isAtom :: (Boolean a) => BoolExpr f a -> Bool
+isAtom (Const _) = True
+isAtom (Var _)   = True
+isAtom _         = False
+
+-- | Return 'True' if s and t are complementary literals.
+complementary :: (Boolean a) => BoolExpr f a -> BoolExpr f a -> Bool
+complementary (Not p) q | isAtom p /\ isAtom q = p == q
+complementary p (Not q) | isAtom p /\ isAtom q = p == q
+complementary _ _       = False
+
 -- Поиск первой свободной переменной в выражении
-freeVariable :: Boolean a => BoolExpr a -> Maybe Text
+freeVariable :: Boolean a => BoolExpr f a -> Maybe Text
 freeVariable (Const _) = Nothing
 freeVariable (Var v) = Just v
 freeVariable (Not e) = freeVariable e
@@ -77,7 +95,7 @@ freeVariable (Equal x y) = freeVariable x <|> freeVariable y
 freeVariable (Impl x y) = freeVariable x <|> freeVariable y
 
 -- Get all the literals in an expression.
-literals :: Boolean a => BoolExpr a -> Set Text
+literals :: Boolean a => BoolExpr f a -> Set Text
 literals (Var v) = Set.singleton v
 literals (Not e) = literals e
 literals (And x y) = Set.union (literals x) (literals y)
@@ -89,7 +107,7 @@ literals _ = Set.empty
 -----------------------------------------------------------------------------
 
 -- Заменяет все вхождения переменной var на значение val
-guessVariable :: Boolean a => Text -> a -> BoolExpr a -> BoolExpr a
+guessVariable :: Boolean a => Text -> a -> BoolExpr f a -> BoolExpr f a
 guessVariable var val e =
   case e of
     Var v -> if v == var
@@ -108,9 +126,12 @@ guessVariable var val e =
 
 -- Операции упрощения
 
+simplify :: (Boolean a) => BoolExpr f a -> BoolExpr f a
+simplify = fixNegations . fixConstOps . fixDeMorgan
+
 -- Удаление двойных отрицаний
 -- (Not (Not (Var a))) -> Var a
-fixNegations :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixNegations :: (Boolean a) => BoolExpr f a -> BoolExpr f a
 fixNegations expr =
   case expr of
     -- Удаление двойного отрицания
@@ -124,7 +145,7 @@ fixNegations expr =
     x -> x
 
 -- Закон исключения третьего
-fixThird :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixThird :: (Boolean a) => BoolExpr f a -> BoolExpr f a
 fixThird expr =
   case expr of
     And (Var x) (Not (Var y)) | x == y -> (Const bFalse)
@@ -135,7 +156,7 @@ fixThird expr =
 -- Упрощает операции с константами:
 -- (Var A) /\ (Const False) -> (Const False)
 -- (Var A) \/ (Const True)  -> (Const True)
-fixConstOps :: (Boolean a) => BoolExpr a -> BoolExpr a
+fixConstOps :: (Boolean a) => BoolExpr f a -> BoolExpr f a
 fixConstOps (Const b) = Const b
 fixConstOps (Var v) = Var v
 fixConstOps (Not e) =
@@ -170,8 +191,8 @@ fixConstOps (And x y) =
 fixConstOps _ = error "Not implemented"
 
 -- Повторения
-fixRepeats :: Boolean a => BoolExpr a -> BoolExpr a
-fixRepeats (Var v) = (Var v)
+fixRepeats :: Boolean a => BoolExpr f a -> BoolExpr f a
+fixRepeats (Var v) = Var v
 fixRepeats (Not e) = Not (fixRepeats e)
 fixRepeats (Or (Var x) (Var y)) | x == y = Var x
 fixRepeats (Or x y) = Or (fixRepeats x) (fixRepeats y)
@@ -180,23 +201,23 @@ fixRepeats (And x y) = And (fixRepeats x) (fixRepeats y)
 
 -- Распределительный закон для булевого кольца
 -- Например, A /\ (B \/ C) -> (A \/ B) /\ (A \/ C)
-distribute :: Boolean a => BoolExpr a -> BoolExpr a
-distribute expr =
+fixDistribute :: Boolean a => BoolExpr f a -> BoolExpr f a
+fixDistribute expr =
   case expr of
     Or x (And y z) ->
-      And (Or (distribute x) (distribute y))
-          (Or (distribute x) (distribute z))
+      And (Or (fixDistribute x) (fixDistribute y))
+          (Or (fixDistribute x) (fixDistribute z))
     Or (And y z) x ->
-      And (Or (distribute x) (distribute y))
-          (Or (distribute x) (distribute z))
+      And (Or (fixDistribute x) (fixDistribute y))
+          (Or (fixDistribute x) (fixDistribute z))
 
-    Or x y -> Or (distribute x) (distribute y)
-    And x y -> And (distribute x) (distribute y)
-    Not x -> Not (distribute x)
+    Or x y -> Or (fixDistribute x) (fixDistribute y)
+    And x y -> And (fixDistribute x) (fixDistribute y)
+    Not x -> Not (fixDistribute x)
     x -> x
 
 -- Закон Де Моргана
-fixDeMorgan :: Boolean a => BoolExpr a -> BoolExpr a
+fixDeMorgan :: Boolean a => BoolExpr f a -> BoolExpr f a
 fixDeMorgan expr =
   case expr of
     Not (And x y) -> Or (fixNegations $ Not x) (fixNegations $ Not y)
@@ -207,7 +228,7 @@ fixDeMorgan expr =
 
 -- Determine whether a literal has a polarity.
 -- Return Nothing if the literal doesn't appear in the expression.
-literalPolarity :: (Boolean a) => BoolExpr a -> Text -> Maybe Polarity
+literalPolarity :: (Boolean a) => BoolExpr f a -> Text -> Maybe Polarity
 
 -- Literal in positive polarity
 literalPolarity (Var v) v'
@@ -237,7 +258,7 @@ literalPolarity e v =
                       then Just Negative
                       else Just Mixed
 
-literalElimination :: (Boolean a) => BoolExpr a -> BoolExpr a
+literalElimination :: (Boolean a) => BoolExpr f a -> BoolExpr f a
 literalElimination e =
   let ls = Set.toList (literals e)
       ps = map (literalPolarity e) ls
@@ -258,7 +279,7 @@ literalElimination e =
 
 -- Определение, состоит ли выражение из одной переменной
 -- Если да, то функция принимает значение (имя переменной, ее "полярность");.
-unitClause :: (Boolean a) => BoolExpr a -> Maybe (Text, a)
+unitClause :: (Boolean a) => BoolExpr f a -> Maybe (Text, a)
 unitClause (Var v) = Just (v, bTrue)
 unitClause (Not (Var v)) = Just (v, bFalse)
 unitClause _ = Nothing

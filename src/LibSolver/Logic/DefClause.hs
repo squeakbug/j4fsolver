@@ -1,5 +1,6 @@
 module LibSolver.Logic.DefClause where
 
+{-
 data DefClauseKB p t = DC [DefiniteClause]
 
 instance KB DefClauseKB DefiniteClause Bool where
@@ -11,3 +12,4 @@ instance KB DefClauseKB DefiniteClause Bool where
         else False
     askVars           = undefined
     axioms  (DC cs)   = cs 
+-}

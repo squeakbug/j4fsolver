@@ -1,46 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE StandaloneDeriving  #-}
-
 module LibSolver.Search.Node
-    ( 
+    (
     ) where
-
-import Data.Text (Text)
-
-import LibSolver.Search.SearchState (SearchState)
-
--- |Узел в дереве поиска. 
---  Обратите внимание, что если к состоянию можно прийти двумя путями, то будет два узла с одинаковым состоянием. 
-data Node s a = Node 
-    { state  :: s                -- Состояние узла
-    , parent :: Maybe (Node s a) -- Cсылка на родителя (узел, преемником которого он является)
-    , action :: Maybe a          -- (Optional) Действие, которое привело к этому состоянию
-    , cost   :: Cost             -- (Optional) Стоимость пути до данного узла
-    , depth  :: Int              -- Количество вершин от корня до узла
-    , value  :: Double           -- Стоимость вершины
-    }
-
-instance (Show s, Show a) => Show (Node s a) where
-    show (Node state _ action cost depth _) =
-        "Node(state=" ++ show state ++ ",action=" ++ show action ++ 
-            ",cost=" ++ show cost ++ ",depth=" ++ show depth ++ ")"
-
-root :: (Problem p s a) => p s a -> Node s a
-root p = Node s Nothing Nothing 0 0 (valueP p s) where s = initial p
-
-path :: Node s a -> [Node s a]
-path n = case parent n of
-    Nothing -> [n]
-    Just n' -> n : path n'
-
--- |Возвращает список узлов, достижимых из данного узла в контексте указанной проблемы.
-expand :: (Problem p s a) => p s a -> Node s a -> [Node s a]
-expand p node = [ mkNode a s | (a,s) <- successor p (state node) ]
-    where
-        mkNode a s = Node s (Just node) (Just a) (c a s) (1 + depth node) v
-        c      a s = costP p (cost node) (state node) a s
-        v          = valueP p (state node)
 
 ---------------------------------------------------------------------------------
 

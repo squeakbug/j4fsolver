@@ -1,3 +1,3 @@
-module LibSolver.CSP.A3 where
+module LibSolver.CSP.A3
     (
     ) where
