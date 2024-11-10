@@ -3,11 +3,10 @@ module LibSolver.Util where
 import Control.Concurrent.STM
 import Control.DeepSeq
 import Control.Monad
-import Control.Monad.Error
+import Control.Monad.Except
 import Control.Monad.Random
 import Data.Map (Map, (!))
 import System.CPUTime
-import System.Random
 import System.Timeout
 
 import qualified Data.List as L
@@ -82,15 +81,16 @@ elemsAt as is = map (as!!) is
 insert :: Int -> a -> [a] -> [a]
 insert 0 n (_:xs) = n : xs
 insert i n (x:xs) = x : insert (i-1) n xs
+insert _ _ [] = error "insert"
 
 -- |Delete every occurence of this element from the list
 deleteEvery :: Eq a => a -> [a] -> [a]
-deleteEvery x []     = []
+deleteEvery _ []     = []
 deleteEvery x (y:ys) = if y == x then deleteEvery x ys else y : deleteEvery x ys
 
 -- |Delete all the elements of the first list from the second list
 deleteAll :: Eq a => [a] -> [a] -> [a]
-deleteAll xs []     = []
+deleteAll __ []     = []
 deleteAll xs (y:ys) = if y `elem` xs then deleteAll xs ys else y : deleteAll xs ys
 
 -- |Return a list of all (ordered) pairs of elements of a list.
@@ -115,6 +115,7 @@ points (a:as) = (a,as) : [ (b,a:bs) | (b,bs) <- points as ]
 
 -- |Return 'True' if all elements of the list are equal.
 allEqual :: Eq a => [a] -> Bool
+allEqual [] = False
 allEqual (a:as) = all (==a) as
 
 -- |Return the most common value in a list.
@@ -306,7 +307,7 @@ sampleOne xs = do
 
 -- |Choose @n@ elements with replacement from a list.
 sampleWithReplacement :: RandomGen g => Int -> [a] -> Rand g [a]
-sampleWithReplacement 0 xs = return []
+sampleWithReplacement 0 _ = return []
 sampleWithReplacement n xs = do
     y  <- sampleOne xs
     ys <- sampleWithReplacement (n-1) xs
@@ -323,10 +324,10 @@ getRandomEnum i = getRandomR (0,i-1) >>= return . toEnum
 
 -- |Choose a random element from a list, given a generator.
 randomChoice :: RandomGen g => g -> [a] -> (a, g)
-randomChoice g [] = error "Empty list -- RANDOMCHOICE"
-randomChoice g xs = (xs !! n, next)
+randomChoice _ [] = error "Empty list -- RANDOMCHOICE"
+randomChoice g xs = (xs !! n, next')
     where
-        (n, next) = randomR (0, length xs - 1) g
+        (n, next') = randomR (0, length xs - 1) g
 
 -- |Choose a random element from a list, in the IO monad.
 randomChoiceIO :: [a] -> IO a

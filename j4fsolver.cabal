@@ -8,7 +8,7 @@ homepage:           https://github.com/squeakbug/j4fsolver
 license:            MIT
 license-file:       LICENSE
 
-author:             squeakbug73
+author:             squeakbug
 maintainer:         squeakbug73@outlook.com
 
 category:           Math
@@ -21,7 +21,15 @@ source-repository head
     location: https://github.com/squeakbug/j4fsolver
 
 common warnings
-    ghc-options: -Wall
+    ghc-options: -Wall -O3
+
+common executables-properties
+    import:           warnings
+    build-depends:
+          base ^>=4.17.2.1
+        , j4fsolver
+        , relude
+    default-language: GHC2021
 
 library
     import:           warnings
@@ -114,58 +122,45 @@ library
     ghc-options:      -Wall -O3
     default-language: GHC2021
 
-executable simple-search
-    import:           warnings
+executable latin-square
+    import:           executables-properties
     main-is:          Main.hs
-    build-depends:
-          base ^>=4.17.2.1
-        , j4fsolver
-        , containers
-        , split
-        , transformers
-        , prettyprinter
-        , lens
-        , template-haskell
+    hs-source-dirs:   examples/LatinSquare
 
-    hs-source-dirs:   examples/SimpleSearch
-    ghc-options:      -Wall -O3
-    default-language: GHC2021
-
-executable eight-queens
-    import:           warnings
+executable map-coloring
+    import:           executables-properties
     main-is:          Main.hs
-    build-depends:
-          base ^>=4.17.2.1
-        , j4fsolver
-        , containers
-        , split
-        , relude
-        , transformers
-        , prettyprinter
-        , lens
-        , template-haskell
+    hs-source-dirs:   examples/MapColoring
 
-    hs-source-dirs:   examples/EightQueens
-    ghc-options:      -Wall -O3
-    default-language: GHC2021
-
-executable eight-rooks
-    import:           warnings
+executable nqueens
+    import:           executables-properties
     main-is:          Main.hs
-    build-depends:
-          base ^>=4.17.2.1
-        , j4fsolver
-        , containers
-        , split
-        , relude
-        , transformers
-        , prettyprinter
-        , lens
-        , template-haskell
+    hs-source-dirs:   examples/NQueens
 
-    hs-source-dirs:   examples/EightRooks
-    ghc-options:      -Wall -O3
-    default-language: GHC2021
+executable place-and-route
+    import:           executables-properties
+    main-is:          Main.hs
+    hs-source-dirs:   examples/PlaceAndRoute
+
+executable rubik
+    import:           executables-properties
+    main-is:          Main.hs
+    hs-source-dirs:   examples/Rubik
+
+executable search-in-graph
+    import:           executables-properties
+    main-is:          Main.hs
+    hs-source-dirs:   examples/SearchInGraph
+
+executable sudoku
+    import:           executables-properties
+    main-is:          Main.hs
+    hs-source-dirs:   examples/Sudoku
+
+executable tag
+    import:           executables-properties
+    main-is:          Main.hs
+    hs-source-dirs:   examples/Tag
 
 test-suite j4fsolver-test
     import:           warnings

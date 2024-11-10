@@ -1,4 +1,6 @@
-# Библиотека методов дискретного программирования
+# j4fsolver
+
+Библиотека методов решения задач разрешимости и дискретного программирования
 
 ## Сборка
 
@@ -20,7 +22,8 @@ cabal run eight-queens
 cabal test
 ```
 
-## Reference implementation:
+## Список использованных источников:
 
 - [ ] https://github.com/chris-taylor/aima-haskell
 - [ ] https://andrew.gibiansky.com/blog/verification/writing-a-sat-solver/
+- [ ] Старая книга со списком всех (доказанных на тот момент) NP-полных и NP-трудных задач

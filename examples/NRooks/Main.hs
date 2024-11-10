@@ -6,6 +6,10 @@ module Main where
 
 import Relude
 
+{-
+
+import Relude
+
 import LibSolver.Vertex (Vertex(Vertex, vertexLabel), vertexState)
 import LibSolver.DiGraph (DiGraph(..))
 import LibSolver.Search.SearchState (SearchState (produce))
@@ -148,3 +152,8 @@ main :: IO ()
 main = do
     print $ finalVertex solveWithBfs
     print $ finalVertex solveWithDfs
+-}
+
+main :: IO ()
+main = do
+    putStrLn "Hello world!"

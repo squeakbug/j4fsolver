@@ -1,14 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
-
 module Main where
-
-import Control.Lens
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.State
-
-import LibSolver
-import LibSolver.DiGraph
-import LibSolver.DiGraph.Vertices
 
 {-
 data AppState = AppState

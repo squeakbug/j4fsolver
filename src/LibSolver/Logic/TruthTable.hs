@@ -5,13 +5,13 @@ module LibSolver.Logic.TruthTable where
 import Data.Text (Text)
 
 import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.Set as S
 
-import LibSolver.BoolExpr 
+import LibSolver.BoolExpr
     ( BoolExpr(..)
     , BoolExprForm(CNF)
-    , Boolean (bTrue, bFalse, bNot, (/\), (\/))
-    , isAtom
+    , Boolean (bTrue, bFalse, bNot, (\/), beval)
+    , literals
     )
 import LibSolver.Util
 import LibSolver.BoolExpr.CNF (cnf, conjuncts)
@@ -24,7 +24,7 @@ import LibSolver.Logic (KB(..))
 newtype TruthTableKB p t = TT [BoolExpr CNF t]
 
 -- |The 'KB' instance for a knowledge base that uses truth tables for inference.
-instance KB TruthTableKB (BoolExpr CNF a) a where
+instance (Boolean a) => KB TruthTableKB (BoolExpr CNF a) a where
     empty              = TT []
     tell     (TT ps) p = TT $ ps ++ conjuncts (cnf p)
     retract  (TT ps) p = TT $ L.delete p ps
@@ -43,7 +43,7 @@ ttEntails s t = and $ ttCheck (s `Impl` t)
 -- |Helper function for ttEntails. Evaluates the expression in all possible
 --  models.
 ttCheck :: (Boolean a) => BoolExpr f a -> [Bool]
-ttCheck expr = map check $ allModels (vars expr)
+ttCheck expr = map check $ allModels (S.toList $ literals expr)
     where
         check model = case plTrue model expr of
             Nothing -> error "Should never see this."
@@ -54,23 +54,23 @@ ttCheck expr = map check $ allModels (vars expr)
 -- |Is the propositional sentence a tautology - is it true in all possible
 --  models (i.e. is it entailed by true?)
 ttTrue :: (Boolean a) => BoolExpr f a -> Bool
-ttTrue s = true `ttEntails` s
+ttTrue s = Const bTrue `ttEntails` s
 
 -- |Is the propositional sentence a contradiction - is it false in all
 --  possible models (i.e. does it entail false?)
 ttFalse :: (Boolean a) => BoolExpr f a -> Bool
-ttFalse s = s `ttEntails` False
+ttFalse s = s `ttEntails` Const bFalse
 
 -- |Return 'True' if the propositional logic expression is true in the model,
 --  and 'False' if it is false. If the model does not specify the value for
 --  every proposition then return 'Nothing' (note that this may happen even
 --  when the expression is tautological).
-plTrue :: (Boolean a) => [(Text, a)] -> BoolExpr f a -> Maybe a
-plTrue _ (Const b)  = Just b
+plTrue :: (Boolean a) => [(Text, Bool)] -> BoolExpr f a -> Maybe Bool
+plTrue _ (Const b)  = Just (beval b)
 plTrue model (Var p)  = lookup p model
 plTrue model (Not p)  = bNot <$> plTrue model p
-plTrue model (And l r) = (/\) <$> mapM (plTrue model) [l, r]
-plTrue model (Or l r)  = (\/)  <$> mapM (plTrue model) [l, r]
+plTrue model (And l r) = and <$> mapM (plTrue model) [l, r]
+plTrue model (Or l r)  = or  <$> mapM (plTrue model) [l, r]
 plTrue model (Impl p q) = do
     x <- plTrue model p
     y <- plTrue model q

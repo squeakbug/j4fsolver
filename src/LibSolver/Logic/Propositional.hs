@@ -1,18 +1,23 @@
 {-# LANGUAGE DataKinds #-}
 
-module LibSolver.Logic.Propositional
-    ( 
-    ) where
+module LibSolver.Logic.Propositional where
 
 import qualified Data.List as L
-import           Data.Map (Map, (!))
+import           Data.Map ((!))
 import qualified Data.Map as M
+import           Data.Text (unpack)
 
-import LibSolver.BoolExpr (BoolExpr(..), BoolExprForm(CNF), Boolean (bTrue, bFalse), isAtom)
+import LibSolver.BoolExpr
+    ( BoolExpr(..)
+    , BoolExprForm(CNF, DNF)
+    , Boolean (bTrue, bFalse)
+    , isAtom
+    , complementary
+    )
 import LibSolver.BoolExpr.CNF (cnf, conjuncts)
 import LibSolver.Logic (KB(..))
-import Control.Monad.Trans.Error (throwError)
-import LibSolver.BoolExpr.DNF (disjuncts)
+import LibSolver.BoolExpr.DNF (disjuncts, isTautology, dnf)
+import LibSolver.Util (isSubSet, unorderedPairs)
 
 -----------------------------------------------------------------------------
 
@@ -32,11 +37,12 @@ newtype PropKB p t = PropKB [BoolExpr CNF t]
 
 -- | Экземпляр типажа базы знаний в пропозиционной логике. 
 --   Для разрешения используется функция 'plResolution'.
-instance KB PropKB (BoolExpr CNF a) a where
+instance (Boolean a) => KB PropKB (BoolExpr CNF a) a where
     empty                  = PropKB []
     tell     (PropKB ps) p = PropKB $ ps ++ conjuncts (cnf p)
     retract  (PropKB ps) p = PropKB $ L.delete p ps
-    ask      (PropKB ps) = plResolution (And ps)
+    ask      (PropKB [l, r]) p = plResolution (And l r) p
+    ask      _ _ = error "ask"
     askVars                = undefined
     axioms   (PropKB ps)   = ps
 
@@ -44,37 +50,39 @@ instance KB PropKB (BoolExpr CNF a) a where
 
 -- Resolution
 
-plResolution :: BoolExpr f a -> BoolExpr f a -> a
-plResolution s t = go $ conjuncts $ cnf $ And [s, Not t]
+plResolution :: (Boolean a) => BoolExpr f a -> BoolExpr f a -> Bool
+plResolution s t = go $ map dnf $ conjuncts $ cnf $ And s (Not t)
     where
-        go clauses = if contradictionDerived
-            then True
-            else if new `isSubSet` clauses
-                then False
-                else go (L.union clauses new)
+        go clauses
+          | contradictionDerived = True
+          | new `isSubSet` clauses = False
+          | otherwise = go (clauses `L.union` new)
+          where
+              (contradictionDerived, new)
+                = foldr resolve (False, []) (unorderedPairs clauses)
 
-            where
-                (contradictionDerived, new) =
-                    foldr resolve (False, []) (unorderedPairs clauses)
-
+        -- resolve :: ([BoolExpr DNF a], [BoolExpr DNF a]) 
+        --         -> (Bool, [BoolExpr DNF a]) 
+        --         -> (Bool, [BoolExpr DNF a])
         resolve (_,_) (True, new)  = (True, new)
-        resolve (x,y) (False, new) = if false `elem` resolvents
+        resolve (x,y) (False, new) = if Const bFalse `elem` resolvents
             then (True, new)
-            else (False, L.union new resolvents)
+            else (False, new `L.union` resolvents)
             where
                 resolvents = plResolve x y
 
 -- | Return the set of all possible clauses obtained by resolving the two inputs.
-plResolve :: BoolExpr f a -> BoolExpr f a -> [BoolExpr f a]
+plResolve :: (Boolean a) => BoolExpr DNF a -> BoolExpr DNF a -> [BoolExpr DNF a]
 plResolve p q =
     filter (not . isTautology) [resolve x y | x <- ps, y <- qs, complementary x y]
     where
         ps = disjuncts p
         qs = disjuncts q
 
-        resolve x y = case L.union (L.delete x ps) (L.delete y qs) of
+        resolve x y = case (x `L.delete` ps) `L.union` (y `L.delete` qs) of
             [] -> Const bFalse
-            xs -> Or xs
+            [l, r] -> Or l r
+            _ -> error "Unreachable"
 
 
 -----------------------------------------------------------------------------
@@ -83,26 +91,28 @@ plResolve p q =
 
 type Symbol = String
 
-data DefiniteClause = DefiniteClause { premises :: [Symbol]
-                                     , conclusion :: Symbol } deriving (Eq,Ord)
+data DefiniteClause = DefiniteClause
+    { premises :: [Symbol]
+    , conclusion :: Symbol
+    } deriving (Eq,Ord)
 
 instance Show DefiniteClause where
-    show (DefiniteClause []   hd) = hd 
+    show (DefiniteClause []   hd) = hd
     show (DefiniteClause body hd) =
-        (concat $ L.intersperse " & " body) ++ " => " ++ hd
+        L.intercalate " & " body ++ " => " ++ hd
 
-toDefiniteClause :: BoolExpr f a -> ThrowsError DefiniteClause
+toDefiniteClause :: (Show a, Boolean a) => BoolExpr CNF a -> ThrowsError DefiniteClause
 toDefiniteClause (Const x) = return $ DefiniteClause [] (show x)
-toDefiniteClause (Var x) = return $ DefiniteClause [] x
+toDefiniteClause (Var x) = return $ DefiniteClause [] (unpack x)
 toDefiniteClause (p `Impl` q) = if all isAtom xs && isAtom q
     then return $ DefiniteClause (map toSym xs) (toSym q)
-    else throwError InvalidExpression
+    else error "InvalidExpression"
         where xs = conjuncts p
-toDefiniteClause _ = throwError InvalidExpression
+toDefiniteClause _ = error "InvalidExpression"
 
-toSym :: BoolExpr f a -> Symbol
+toSym :: (Show a, Boolean a) => BoolExpr f a -> Symbol
 toSym (Const x) = show x
-toSym (Var x) = x
+toSym (Var x) = unpack x
 toSym _       = error "Not an atom -- AI.Logic.Propositional.toSym"
 
 isFact :: (Boolean a) => DefiniteClause -> a
@@ -116,26 +126,25 @@ facts = map conclusion . filter isFact
 
 -- Forward Chaining
 
-fcEntails :: [DefiniteClause] -> Symbol -> a
+fcEntails :: [DefiniteClause] -> Symbol -> Bool
 fcEntails kb q = go initialCount [] (facts kb)
     where
-        go count inferred []     = False
-        go count inferred (p:ps) = if p == q
-            then True
-            else if p `elem` inferred
-                    then go count inferred ps
-                    else go count' (p:inferred) agenda'
-                        where (count', agenda') = run kb p count ps
+        go _     _        []     = False
+        go count inferred (p:ps)
+          | p == q = True
+          | p `elem` inferred = go count inferred ps
+          | otherwise = go count' (p:inferred) agenda'
+          where
+              (count', agenda') = run kb p count ps
 
-        run []     p count agenda = (count, agenda)
-        run (c:cs) p count agenda = if not (p `elem` premises c)
-            then run cs p count agenda
-            else if n == 1
-                    then run cs p count' (conclusion c:agenda)
-                    else run cs p count' agenda
-            where
-                n    = count ! c
-                count' = M.insert c (n-1) count
+        run []     _ count agenda = (count, agenda)
+        run (c:cs) p count agenda
+          | p `notElem` premises c = run cs p count agenda
+          | n == 1 = run cs p count' (conclusion c:agenda)
+          | otherwise = run cs p count' agenda
+          where
+              n = count ! c
+              count' = M.insert c (n - 1) count
 
         initialCount = foldr f M.empty kb
-            where f c count = M.insert c (length $ premises c) count
+            where f c = M.insert c (length $ premises c)

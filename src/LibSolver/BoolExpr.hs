@@ -152,6 +152,7 @@ fixThird expr =
     And (Not (Var x)) (Var y) | x == y -> (Const bFalse)
     Or (Var x) (Not (Var y)) | x == y -> (Const bTrue)
     Or (Not (Var x)) (Var y) | x == y -> (Const bTrue)
+    _ -> error "Unreachable"
 
 -- Упрощает операции с константами:
 -- (Var A) /\ (Const False) -> (Const False)
@@ -198,6 +199,7 @@ fixRepeats (Or (Var x) (Var y)) | x == y = Var x
 fixRepeats (Or x y) = Or (fixRepeats x) (fixRepeats y)
 fixRepeats (And (Var x) (Var y)) | x == y = Var x
 fixRepeats (And x y) = And (fixRepeats x) (fixRepeats y)
+fixRepeats _ = error "Not implemented"
 
 -- Распределительный закон для булевого кольца
 -- Например, A /\ (B \/ C) -> (A \/ B) /\ (A \/ C)

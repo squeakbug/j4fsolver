@@ -4,6 +4,7 @@ module LibSolver.BoolExpr.DNF
   ( dnf
   , disjuncts
   , unitPropagation
+  , isTautology
   ) where
 
 import Data.Text (Text)
@@ -56,7 +57,7 @@ unitPropagation expr = replaceAll expr
 -- | Return 'True' if a disjunction of literals can be demonstrated to be a
 --   tautology without need of evaluation - this is the case if it contains two
 --   complementary literals.
-isTautology :: (Boolean a) => BoolExpr DNF a -> a
+isTautology :: (Boolean a) => BoolExpr DNF a -> Bool
 isTautology expr = any (uncurry complementary) clausePairs
     where
         clausePairs = unorderedPairs (disjuncts expr)

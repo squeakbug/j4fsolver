@@ -4,6 +4,7 @@ module LibSolver.BoolExpr.CNF
   ( cnf
   , conjuncts
   , unitPropagation
+  , isTautology
   ) where
 
 import Data.Text (Text)
@@ -16,8 +17,9 @@ import LibSolver.BoolExpr
     , guessVariable
     , fixNegations
     , fixDistribute
-    , unitClause
+    , unitClause, complementary
     )
+import LibSolver.Util (unorderedPairs)
 
 -- Приведение к КНФ без проверок
 cnfUnsafe :: (Boolean a) => BoolExpr f a -> BoolExpr CNF a
@@ -51,3 +53,10 @@ unitPropagation expr = replaceAll expr
     assignments = allUnitconjuncts expr
     replaceAll = foldl (.) id (map (uncurry guessVariable) assignments)
 
+-- | Return 'True' if a disjunction of literals can be demonstrated to be a
+--   tautology without need of evaluation - this is the case if it contains two
+--   complementary literals.
+isTautology :: (Boolean a) => BoolExpr CNF a -> Bool
+isTautology expr = any (uncurry complementary) clausePairs
+    where
+        clausePairs = unorderedPairs (conjuncts expr)
