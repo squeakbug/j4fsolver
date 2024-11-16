@@ -50,7 +50,7 @@ instance (Boolean a) => KB PropKB (BoolExpr CNF a) a where
 
 -- Resolution
 
-plResolution :: (Boolean a) => BoolExpr f a -> BoolExpr f a -> Bool
+plResolution :: forall f a. (Boolean a) => BoolExpr f a -> BoolExpr f a -> Bool
 plResolution s t = go $ map dnf $ conjuncts $ cnf $ And s (Not t)
     where
         go clauses
@@ -61,9 +61,9 @@ plResolution s t = go $ map dnf $ conjuncts $ cnf $ And s (Not t)
               (contradictionDerived, new)
                 = foldr resolve (False, []) (unorderedPairs clauses)
 
-        -- resolve :: ([BoolExpr DNF a], [BoolExpr DNF a]) 
-        --         -> (Bool, [BoolExpr DNF a]) 
-        --         -> (Bool, [BoolExpr DNF a])
+        resolve :: (BoolExpr DNF a, BoolExpr DNF a) 
+                -> (Bool, [BoolExpr DNF a]) 
+                -> (Bool, [BoolExpr DNF a])
         resolve (_,_) (True, new)  = (True, new)
         resolve (x,y) (False, new) = if Const bFalse `elem` resolvents
             then (True, new)

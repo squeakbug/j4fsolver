@@ -29,6 +29,7 @@ common executables-properties
           base ^>=4.17.2.1
         , j4fsolver
         , relude
+        , containers
     default-language: GHC2021
 
 library
@@ -38,6 +39,7 @@ library
         LibSolver.Agent
         LibSolver.Agent.ModelBasedReflex
         LibSolver.Agent.SimpleReflex
+        LibSolver.ASP
         LibSolver.BoolExpr
         LibSolver.BoolExpr.Circuit
         LibSolver.BoolExpr.CNF
@@ -51,12 +53,14 @@ library
         LibSolver.Compute.Markov
         LibSolver.Compute.Turing
         LibSolver.CSP
-        LibSolver.CSP.A3
+        LibSolver.CSP.AC3
         LibSolver.CSP.Backtracking
+        LibSolver.CSP.HillClimbing
         LibSolver.Logic
         LibSolver.Logic.Combinatorial
         LibSolver.Logic.DefClause
         LibSolver.Logic.FirstOrder
+        LibSolver.Logic.FirstOrder.Printer
         LibSolver.Logic.Modal
         LibSolver.Logic.Propositional
         LibSolver.Logic.Temporal
@@ -71,14 +75,11 @@ library
         LibSolver.SAT.WalkSAT
         LibSolver.Search
         LibSolver.Search.AStar
-        LibSolver.Search.Bfs
         LibSolver.Search.BranchAndBound
-        LibSolver.Search.Dfs
+        LibSolver.Search.Core
         LibSolver.Search.Dijkstra
-        LibSolver.Search.Heuristic
-        LibSolver.Search.InfoSearch
-        LibSolver.Search.Node
-        LibSolver.Search.Problem
+        LibSolver.Search.Informed
+        LibSolver.Search.Uninformed
         LibSolver.Types
         LibSolver.Types.Graph
         LibSolver.Types.ProbDist

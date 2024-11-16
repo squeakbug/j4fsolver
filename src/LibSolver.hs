@@ -1,26 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module LibSolver
-    ( module LibSolver.Agent
-    , module LibSolver.BoolExpr
-    , module LibSolver.Compute
-    , module LibSolver.CSP
-    , module LibSolver.Logic
-    , module LibSolver.Planning
-    , module LibSolver.SAT
-    , module LibSolver.Search
-    , module LibSolver.Types
-    ) where
-
-import LibSolver.Agent
-import LibSolver.BoolExpr
-import LibSolver.Compute
-import LibSolver.CSP
-import LibSolver.Logic
-import LibSolver.Planning
-import LibSolver.SAT
-import LibSolver.Search
-import LibSolver.Types
+module LibSolver where
 
 -- Как эффективно представлять пространства состояний (например, игровую карту)?
 
