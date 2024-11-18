@@ -1,3 +1,1 @@
-module LibSolver.Planning 
-    (
-    ) where
+module LibSolver.Planning where

@@ -39,17 +39,17 @@ depthLimitedSearch :: (Problem p s a) =>
                    -> DepthLimited (Node s a)
 depthLimitedSearch lim prob = recursiveDLS (root prob) prob lim
     where
-        recursiveDLS node p lim
+        recursiveDLS node p lim'
             | goalTest p (state node) = Ok node
-            | depth node == lim       = Cutoff
+            | depth node == lim'      = Cutoff
             | otherwise               = filt False $ map go (expand prob node)
             where
-                go node = recursiveDLS node p lim
+                go node' = recursiveDLS node' p lim'
 
                 filt cutoff [] = if cutoff then Cutoff else Fail
-                filt cutoff (Ok node : _)    = Ok node
+                filt _ (Ok node' : _)    = Ok node'
                 filt cutoff (Fail    : rest) = filt cutoff rest
-                filt cutoff (Cutoff  : rest) = filt True   rest
+                filt _ (Cutoff  : rest) = filt True   rest
 
 -- |Repeatedly try depth-limited search with an increasing depth limit.
 iterativeDeepeningSearch :: (Problem p s a) => p s a -> Maybe (Node s a)

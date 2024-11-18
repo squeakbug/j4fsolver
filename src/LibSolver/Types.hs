@@ -1,3 +1,1 @@
-module LibSolver.Types 
-    (
-    ) where
+module LibSolver.Types where

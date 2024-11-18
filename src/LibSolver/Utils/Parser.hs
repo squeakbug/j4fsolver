@@ -1,4 +1,4 @@
-module LibSolver.Utils.Perser where
+module LibSolver.Utils.Parser where
 
 data Expr
   = Var String

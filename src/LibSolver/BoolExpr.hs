@@ -148,10 +148,10 @@ fixNegations expr =
 fixThird :: (Boolean a) => BoolExpr f a -> BoolExpr f a
 fixThird expr =
   case expr of
-    And (Var x) (Not (Var y)) | x == y -> (Const bFalse)
-    And (Not (Var x)) (Var y) | x == y -> (Const bFalse)
-    Or (Var x) (Not (Var y)) | x == y -> (Const bTrue)
-    Or (Not (Var x)) (Var y) | x == y -> (Const bTrue)
+    And (Var x) (Not (Var y)) | x == y -> Const bFalse
+    And (Not (Var x)) (Var y) | x == y -> Const bFalse
+    Or (Var x) (Not (Var y))  | x == y -> Const bTrue
+    Or (Not (Var x)) (Var y)  | x == y -> Const bTrue
     _ -> error "Unreachable"
 
 -- Упрощает операции с константами:

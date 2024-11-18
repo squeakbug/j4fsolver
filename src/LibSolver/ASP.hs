@@ -1,3 +1,1 @@
-module LibSolver.ASP
-    (
-    ) where
+module LibSolver.ASP where

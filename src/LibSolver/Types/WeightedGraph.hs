@@ -1,21 +1,12 @@
-module LibSolver.Types.WeightedGraph
-    ( WeightedGraph(..)
-    , toGraph
-    , toUndirectedGraph
-    , getNodes
-    , getNeighbours
-    , getEdge
-    , addEdge
-    , addUndirectedEdge
-    , writeGraphs
-    , readGraphs 
-    ) where
+module LibSolver.Types.WeightedGraph where
 
 import Control.Monad (forM_)
-import Data.Map (Map, (!))
+import Data.Map (Map)
+import Data.Maybe
+
 import qualified Data.Map as M
 import qualified Data.List as L
-import qualified Data.Text as T
+
 import System.IO
 
 ---------------------
@@ -27,6 +18,8 @@ import System.IO
 --  functions 'toGraph' (for a directed graph) and 'toUndirectedGraph' (for
 --  an undirected graph).
 type WeightedGraph a b = Map a (Map a b)
+
+type WeightedDiGraph a b = Map a (Map a b)
 
 -- |Create a directed graph from an adjacency list.
 toGraph :: Ord a => [(a, [(a,b)])] -> WeightedGraph a b
@@ -57,7 +50,7 @@ getEdge x y g = case M.lookup x g of
 
 -- |Add an edge between two vertices to a WeightedGraph.
 addEdge :: Ord a => a -> a -> b -> WeightedGraph a b -> WeightedGraph a b
-addEdge x y e graph = M.adjust (M.insert y e) x graph
+addEdge x y e = M.adjust (M.insert y e) x
 
 -- |Add an undirected edge between two vertices to a WeightedGraph.
 addUndirectedEdge :: Ord a => a -> a -> b -> WeightedGraph a b -> WeightedGraph a b
@@ -100,11 +93,9 @@ fromPairRep xs = go xs M.empty
         go []           m = m
         go ((a,b,c):xs) m = go xs (M.insert a newMap m)
             where
-                newMap = M.insert b c $ case M.lookup a m of
-                    Nothing -> M.empty
-                    Just m' -> m'
+                newMap = M.insert b c $ fromMaybe M.empty (M.lookup a m)
 
 -- |Take a directed graph in ordered pair representation and add in all of the
 --  reverse links, so that the resulting graph is undirected.
 symmetrize :: (Eq a, Eq b) => [(a,a,b)] -> [(a,a,b)]
-symmetrize xs = L.nub $ concat [ [(a,b,c),(b,a,c)] | (a,b,c) <- xs ] 
+symmetrize xs = L.nub $ concat [ [(a,b,c),(b,a,c)] | (a,b,c) <- xs ]

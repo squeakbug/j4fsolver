@@ -6,6 +6,7 @@ import Control.Monad
 import Control.Monad.Except
 import Control.Monad.Random
 import Data.Map (Map, (!))
+import Data.Functor
 import System.CPUTime
 import System.Timeout
 
@@ -75,7 +76,7 @@ notNull = not . null
 
 -- |Return the elements of a list at the specified indexes.
 elemsAt :: [a] -> [Int] -> [a]
-elemsAt as is = map (as!!) is
+elemsAt as = map (as!!)
 
 -- |Update the element at position i in a list.
 insert :: Int -> a -> [a] -> [a]
@@ -149,7 +150,7 @@ argMinList xs f = map (xs!!) indices
     where
         ys      = map f xs
         minVal  = minimum ys
-        indices = L.findIndices (== minVal) ys
+        indices = L.elemIndices minVal ys
 
 -- |Return the element of a list that minimizes a function. In case of a tie,
 --  choose randomly with the given generator.
@@ -185,7 +186,7 @@ listToFunction xs = (M.fromList xs !)
 
 -- |Transpose a list of lists.
 transpose :: [[a]] -> [[a]]
-transpose xs = if or (map null xs)
+transpose xs = if any null xs
     then []
     else let heads = map head xs
              tails = map tail xs
@@ -232,7 +233,7 @@ strip = rstrip . lstrip
 
 -- |Join a list of strings, separating them with commas.
 commaSep :: [String] -> String
-commaSep xs = concat $ L.intersperse "," xs
+commaSep = L.intercalate ","
 
 -------------------
 -- Map Functions --
@@ -240,7 +241,7 @@ commaSep xs = concat $ L.intersperse "," xs
 
 -- |A universal map maps all keys to the same value.
 mkUniversalMap :: Ord k => [k] -> a -> Map k a
-mkUniversalMap ks a = M.fromList $ zip ks (repeat a)
+mkUniversalMap ks a = M.fromList $ map (, a) ks
 
 -------------------------
 -- Monadic Combinators --
@@ -265,7 +266,7 @@ untilM predicate prompt action = do
 -- |Run a computation, ignoring the result (i.e. run it only for its side
 --  effects).
 ignoreResult :: Monad m => m a -> m ()
-ignoreResult c = c >> return ()
+ignoreResult = void
 
 -- |Ensure that a monadic computation doesn't throw any errors.
 trapError :: MonadError e m => m () -> m ()
@@ -316,7 +317,7 @@ sampleWithReplacement n xs = do
 -- |Generate a random variable from the 'Enum' and 'Bounded' type class. The
 --  'Int' input specifies how many values are in the enumeration.
 getRandomEnum :: (RandomGen g, Enum a, Bounded a) => Int -> Rand g a
-getRandomEnum i = getRandomR (0,i-1) >>= return . toEnum
+getRandomEnum i = getRandomR (0,i-1) <&> toEnum
 
 --------------------------
 -- Random Numbers (Old) --
@@ -335,13 +336,13 @@ randomChoiceIO xs = getStdGen >>= \g -> return $ fst $ randomChoice g xs
 
 -- |Given a random number generator, return 'True' with probability p.
 probability :: (RandomGen g, Random a, Ord a, Num a) => g -> a -> (Bool, g)
-probability g p = if p' < p then (True, g') else (False, g')
+probability g p = (p' < p, g')
     where
         (p', g') = R.randomR (0,1) g
 
 -- |Return @True@ with probability p.
 probabilityIO :: (R.Random a, Ord a, Num a) => a -> IO Bool
-probabilityIO p = randomIO >>= \q -> return $! if q < p then True else False
+probabilityIO p = randomIO >>= \q -> return $! q < p
 
 --------------------
 -- IO Combinators -- 
@@ -373,7 +374,7 @@ timeLimited t xs = do
 --  of a @TVar@ as they are computed. Note that the result list will be
 --  in reverse order.
 forceIntoTVar :: (NFData a) => TVar [a] -> [a] -> IO ()
-forceIntoTVar v xs = mapM_ (forceCons v) xs
+forceIntoTVar v = mapM_ (forceCons v)
 
 -- |Force a pure value, and cons it onto the front of a list stored in a @TVar@.
 forceCons :: (NFData a) => TVar [a] -> a -> IO ()

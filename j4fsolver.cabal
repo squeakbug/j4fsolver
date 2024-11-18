@@ -74,11 +74,9 @@ library
         LibSolver.SAT.Reta
         LibSolver.SAT.WalkSAT
         LibSolver.Search
-        LibSolver.Search.AStar
-        LibSolver.Search.BranchAndBound
         LibSolver.Search.Core
-        LibSolver.Search.Dijkstra
         LibSolver.Search.Informed
+        LibSolver.Search.Local
         LibSolver.Search.Uninformed
         LibSolver.Types
         LibSolver.Types.Graph
