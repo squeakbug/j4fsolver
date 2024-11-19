@@ -1,32 +1,30 @@
 module Main (main) where
 
-import Test.QuickCheck
+import Data.Maybe
 
-myLast :: [a] -> a
-myLast [] = error "empty list"
-myLast [x] = x
-myLast (_:xs) = myLast xs
+import Test.Hspec
 
-prop_mylast :: [Int] -> Property
-prop_mylast xs = not (null xs) ==> myLast xs == last xs
+import LibSolver.Search
+import LibSolver.Search.Core
 
-some_test :: [Int] -> Property
-    let inGraph = Graph [
-          Vertex "a" ["b", "c"          ] 0 ""
-        , Vertex "b" ["a", "d", "e"     ] 0 ""
-        , Vertex "c" ["a", "d"          ] 0 ""
-        , Vertex "d" ["b", "c", "e"     ] 0 ""
-        , Vertex "e" ["b", "d", "f", "g"] 0 ""
-        , Vertex "f" ["e", "g", "h"     ] 0 ""
-        , Vertex "g" ["e", "f", "i"     ] 0 ""
-        , Vertex "h" ["f", "i"          ] 0 ""
-        , Vertex "i" ["g", "h"          ] 0 ""
-    ]
+data IntProblem s a = IntProblem
+    { pStart   :: Int
+    , pGoal    :: Int
+    }
 
-    let queue = graphVertexes inGraph ["e"]
-    let outGraph = Graph queue
-    let seen = queue
-    let graph = bfs inGraph outGraph queue seen
+instance Problem IntProblem Int Int where
+    initial (IntProblem start _) = start
+    goal (IntProblem _ goal') = goal'
+    successor (IntProblem _ _) cur = [(-1, cur - 1), (1, cur + 1)]
 
 main :: IO ()
-main = quickCheck prop_mylast
+main = hspec $ do
+  describe "graphSearch" $ do
+
+    it "finds the goal in simple case" $ do
+        let problem :: IntProblem Int Int = IntProblem { pStart = 0, pGoal = 5 }
+        let initialQueue = []
+        let result = graphSearch initialQueue problem
+        let goal' :: Maybe Int = fmap state result
+
+        goal' `shouldBe` Just 5

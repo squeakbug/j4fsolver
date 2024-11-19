@@ -9,5 +9,6 @@
 
 ## Двунаправленный поиск
 
-* [Двунаправленный поиск](https://webdocs.cs.ualberta.ca/%7Eholte/Publications/MM-AAAI2016.pdf) - как показала практика, позволяет найти пакет на Hackage по заданным ограничениям)
-
+* [Bidirectional Search That Is Guaranteed to Meet in the Middle](https://webdocs.cs.ualberta.ca/%7Eholte/Publications/MM-AAAI2016.pdf) - как показала практика, позволяет найти пакет на Hackage по заданным ограничениям)
+* [A Brief History and Recent Achievements in Bidirectional Search](https://webdocs.cs.ualberta.ca/~nathanst/papers/Sturtevant18smt.pdf)
+* [Memory-Bounded Bidirectional Search](https://www.cs.huji.ac.il/~jeff/papers/socs17shaham.pdf)

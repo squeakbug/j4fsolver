@@ -30,6 +30,9 @@ common executables-properties
         , j4fsolver
         , relude
         , containers
+        , deepseq
+        , mtl
+        , random
     default-language: GHC2021
 
 library
@@ -74,31 +77,40 @@ library
         LibSolver.SAT.Reta
         LibSolver.SAT.WalkSAT
         LibSolver.Search
+        LibSolver.Search.Compare
         LibSolver.Search.Core
         LibSolver.Search.Informed
         LibSolver.Search.Local
         LibSolver.Search.Uninformed
         LibSolver.Types
         LibSolver.Types.Graph
+        LibSolver.Types.Graph.Parser
         LibSolver.Types.ProbDist
         LibSolver.Types.Queue
         LibSolver.Types.Table
         LibSolver.Types.WeightedGraph
+        LibSolver.Types.WeightedGraph.Parser
         LibSolver.Util
+        LibSolver.Util.Parser
 
     build-depends:
         -- Base
-          base ^>=4.17.2.1
+          base
         , relude
         , split
 
         -- Types
         , combinat
         , containers
+        , monoidal-containers
         , psqueues
+        , free
         , vector
+        , data-fix
         , deepseq
         , lens
+        , optics
+        , lattices
         , transformers
         , mtl
         , tagged
@@ -116,6 +128,7 @@ library
         , MonadRandom
         , template-haskell
         , stm
+        , katip
 
     hs-source-dirs:   src
     ghc-options:      -Wall -O3

@@ -2,6 +2,7 @@
 
 module LibSolver.Types.ProbDist where
 
+import Data.Bifunctor
 import Control.Monad.Random hiding (uniform, weighted)
 import GHC.Float
 
@@ -29,7 +30,7 @@ mapD = fmap
 
 -- |Map over the probabilities of a probability distribution.
 mapP :: (Prob -> Prob) -> Dist a -> Dist a
-mapP f (D xs) = D (map (\(x,p) -> (x,f p)) xs)
+mapP f (D xs) = D (map (second f) xs)
 
 -- |Filter the values of a probability distribution according to some predicate.
 filterD :: (a -> Bool) -> Dist a -> Dist a
@@ -96,7 +97,7 @@ condition False = D []
 -------------------
 
 instance Show a => Show (Dist a) where
-    show (D xs) = concat $ L.intersperse "\n" $ map disp xs
+    show (D xs) = L.intercalate "\n" (map disp xs)
         where
             disp (x,p) = show x ++ replicate (pad x) ' ' ++ showProb p
             pad x      = n - length (show x) + 2
@@ -181,7 +182,7 @@ boolD p = bernoulli p True False
 -- |A uniform distribution over a finite list assigns equal probability to each
 --  of the elements of the list.
 uniform :: [a] -> Dist a
-uniform xs = D $ zip xs (repeat p) where p = 1 / fromIntegral (length xs)
+uniform xs = D $ map (, p) xs where p = 1 / fromIntegral (length xs)
 
 -- |A weighted distribution over a finite list. The weights give the relative
 --  probabilities attached to each outcome.

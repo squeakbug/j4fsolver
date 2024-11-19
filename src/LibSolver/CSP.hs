@@ -75,7 +75,7 @@ allAssigned csp assignment = M.size assignment == length (vars csp)
 hasConflicts :: CSP c v a => c v a -> v -> a -> Assignment v a -> Bool
 hasConflicts  csp v a  = not . M.null . M.filterWithKey conflict
     where
-        conflict x y = not $constraints csp v a x y
+        conflict x y = not $ constraints csp v a x y
 
 -- |Return the number of conflicts that v == a has with other
 --  viables currently assigned.

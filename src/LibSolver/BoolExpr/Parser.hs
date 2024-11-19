@@ -6,47 +6,22 @@ module LibSolver.BoolExpr.Parser
   )
 where
 
-import Data.Void (Void)
-import Data.Text (Text, pack)
+import Data.Text (pack)
 
 import Control.Monad.Combinators
 
 import           Text.Megaparsec.Char
 import           Text.Megaparsec            ((<?>))
-import qualified Text.Megaparsec as P
-import qualified Text.Megaparsec.Char.Lexer as L
 
 import LibSolver.BoolExpr
+import LibSolver.Util.Parser hiding (Expr(Var))
 
-type Parser = P.Parsec Void Text
-
------------------------------------------------------------------------------
-
-sc :: Parser ()
-sc = L.space
-  space1
-  (L.skipLineComment "//")
-  (L.skipBlockComment "/*" "*/")
-
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme sc
-
-symbol :: Text -> Parser Text
-symbol = L.symbol sc
-
-parens :: Parser a -> Parser a
-parens = P.between (symbol "(") (symbol ")")
-
------------------------------------------------------------------------------
-
--- E => E \/ T | E /\ T | T
--- T => T -> F | T = F | F
--- F => Var | Const | !F | (E)
+-- E => E '\/' T | E '/\' T | T
+-- T => T '->' F | T = F | F
+-- F => Var | Const | '!' F | '(' E ')'
 
 pVar :: Parser (BoolExpr f Bool)
-pVar = Var <$> textVar
-  where strVar = lexeme ((:) <$> letterChar <*> many alphaNumChar) <?> "variable"
-        textVar = pack <$> strVar 
+pVar = Var . pack <$> (var <?> "variable")
 
 pNotVar :: Parser (BoolExpr f Bool)
 pNotVar = Not <$> pVar <* string "!"

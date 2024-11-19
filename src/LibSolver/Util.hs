@@ -25,7 +25,7 @@ posInf = 1/0
 
 -- |Negative infinity.
 negInf :: Fractional a => a
-negInf = -1/0
+negInf = -(1/0)
 
 -- |Return the mean of a list of numbers
 mean :: Fractional a => [a] -> a

@@ -12,6 +12,9 @@
 - [mathlib4](https://github.com/leanprover-community/mathlib4)
 - [CreuSAT](https://github.com/sarsko/CreuSAT)
 
+- [Фреймворк для написания верифицируемых программ на Haskell](https://github.com/ucsd-progsys/liquidhaskell)
+- [Improving Haskell types with SMT](https://dl.acm.org/doi/10.1145/2804302.2804307)
+
 - [Верификация "синтезируемой" логики](https://resources.mpi-inf.mpg.de/departments/rg1/conferences/vtsa15/slides/slides-schubert2.pdf)
 - [Верификация ПО](https://trustworthy.systems/publications/papers/Paturel_SH_23.pdf)
 - [Направленный фаззинг](https://github.com/ispras/oss-sydr-fuzz)
