@@ -4,7 +4,7 @@
 
 ## Applications
 
-- [Awesome book about SAT/SMT applications](https://smt.st/SAT_SMT_by_example.pdf), написанная [Денисом Юричем](https://yurichev.com/). Который также написал ["Введение в reverse engineering для начинающих"](http://library.bagrintsev.me/unsorted/RE_for_beginners-ru.pdf)
+- [Awesome book about SAT/SMT applications](https://smt.st/SAT_SMT_by_example.pdf), написанная [Денисом Юричевым](https://yurichev.com/). Который также написал ["Введение в reverse engineering для начинающих"](http://library.bagrintsev.me/unsorted/RE_for_beginners-ru.pdf)
 
 - [SMT-LIB](https://smt-lib.org/)
 - [bitwuzla](https://bitwuzla.github.io/)
