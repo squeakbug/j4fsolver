@@ -47,6 +47,11 @@ instance Problem NQueens [Maybe Int] (Int,Int) where
             where
                 actions = map (,i) [0..n-1]
 
+    -- ((0, 0), [(0, 0), (0, 0), (0, 0), (0, 0)]) ; 
+    -- ((1, 0), []) ; 
+    -- ((2, 0), []) ; 
+    -- ((3, 0), []) ;
+
     goalTest :: NQueens s a -> [Maybe Int] -> Bool
     goalTest (NQ _) s | isNothing (L.last s) = False
                       | otherwise = not (any f (enumerate s))

@@ -1,5 +1,7 @@
 # j4fsolver
 
+*Hunt the Wumpus!*
+
 Библиотека методов решения задач разрешимости и дискретного программирования
 
 ## Сборка
@@ -27,3 +29,4 @@ cabal test
 - [ ] https://github.com/chris-taylor/aima-haskell
 - [ ] https://andrew.gibiansky.com/blog/verification/writing-a-sat-solver/
 - [ ] Старая книга со списком всех (доказанных на тот момент) NP-полных и NP-трудных задач
+- [ ] https://en.wikipedia.org/wiki/ACT-R

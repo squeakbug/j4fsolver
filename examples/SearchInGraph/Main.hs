@@ -21,7 +21,7 @@ import qualified LibSolver.Types.WeightedGraph as G
 --  between nodes) and a map of graph nodes to locations.
 data GraphMap a = G
     { getGraph     :: WeightedGraph a Cost
-    , getLocations :: Map a Location 
+    , getLocations :: Map a Location
     } deriving (Show,Read)
 
 -- |Type synonym for a pair of doubles, representing a location in cartesian
@@ -109,7 +109,7 @@ randomGraphMap n minLinks width height = State.execStateT go (mkGraphMap [] []) 
                 sorted      = L.sortBy (O.comparing to_x) unconnected
                 to_x y      = euclideanDist (loc ! x) (loc ! y)
                 toAdd       = take (minLinks - numNbrs) sorted
-            
+
             mapM_ (addLink x) toAdd
 
         where
@@ -171,6 +171,48 @@ generateGraphProblems numProbs numNodes minLinks filepath = do
                 Nothing -> go n
                 Just _  -> go (n-1) >>= \ps -> return (p:ps)
 
+-- |The Romania graph from AIMA.
+romania :: GraphMap String
+romania = mkGraphMap
+
+    [ ("A", [("Z",75), ("S",140), ("T",118)])
+    , ("B", [("U",85), ("P",101), ("G",90), ("F",211)])
+    , ("C", [("D",120), ("R",146), ("P",138)])
+    , ("D", [("M",75)])
+    , ("E", [("H",86)])
+    , ("F", [("S",99)])
+    , ("H", [("U",98)])
+    , ("I", [("V",92), ("N",87)])
+    , ("L", [("T",111), ("M",70)])
+    , ("O", [("Z",71), ("S",151)])
+    , ("P", [("R",97)])
+    , ("R", [("S",80)])
+    , ("U", [("V",142)]) ]
+
+    [ ("A",( 91,491)), ("B",(400,327)), ("C",(253,288)), ("D",(165,299))
+    , ("E",(562,293)), ("F",(305,449)), ("G",(375,270)), ("H",(534,350))
+    , ("I",(473,506)), ("L",(165,379)), ("M",(168,339)), ("N",(406,537))
+    , ("O",(131,571)), ("P",(320,368)), ("R",(233,410)), ("S",(207,457))
+    , ("T",( 94,410)), ("U",(456,350)), ("V",(509,444)), ("Z",(108,531)) ]
+
+-- |The Australia graph from AIMA.
+australia :: GraphMap String
+australia = mkGraphMap
+
+    [ ("T",   [])
+    , ("SA",  [("WA",1), ("NT",1), ("Q",1), ("NSW",1), ("V",1)])
+    , ("NT",  [("WA",1), ("Q",1)])
+    , ("NSW", [("Q", 1), ("V",1)]) ]
+
+    [ ("WA",(120,24)), ("NT" ,(135,20)), ("SA",(135,30)),
+      ("Q" ,(145,20)), ("NSW",(145,32)), ("T" ,(145,42)), ("V",(145,37))]
+
+gp1, gp2, gp3  :: GraphProblem String String
+gp1 = GP { graphGP = australia, initGP = "WA", goalGP = "Q" }
+gp2 = GP { graphGP = romania, initGP = "A", goalGP = "B" }
+gp3 = GP { graphGP = romania, initGP = "O", goalGP = "N" }
+
 main :: IO ()
 main = do
-    putStrLn "Hello world!"
+    let result = breadthFirstGraphSearch gp1
+    print $ reverse $ maybe [] path result
