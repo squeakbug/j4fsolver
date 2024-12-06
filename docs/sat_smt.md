@@ -34,5 +34,6 @@
 
 * [Superoptimizer](https://github.com/google/souper)
 * [Super compiler (Hello refal!)](https://wiki.c2.com/?SuperCompiler)
+* [Supercompilation and the Reduceron](https://mn416.github.io/reduceron-project/Meta10Presentation.pdf)
 
 -- --
