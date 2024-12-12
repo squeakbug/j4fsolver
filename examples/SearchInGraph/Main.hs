@@ -1,7 +1,7 @@
 module Main where
 
 import Control.Monad
-import Data.Map (Map, (!))
+import Data.Map ((!))
 import System.IO
 
 import qualified Control.Monad.State as State
@@ -17,16 +17,9 @@ import LibSolver.Util
 
 import qualified LibSolver.Types.WeightedGraph as G
 
--- |Data structure to hold a graph (edge weights correspond to the distance
---  between nodes) and a map of graph nodes to locations.
-data GraphMap a = G
-    { getGraph     :: WeightedGraph a Cost
-    , getLocations :: Map a Location
-    } deriving (Show,Read)
-
--- |Type synonym for a pair of doubles, representing a location in cartesian
---  coordinates.
-type Location = (Double,Double)
+import Comparison
+import Types
+import Parser
 
 -- |Creates a GraphMap from the graph's adjacency list representation and a list
 --  of (node, location) pairs. This function creates undirected graphs, so you

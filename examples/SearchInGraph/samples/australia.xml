@@ -1,0 +1,48 @@
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <graph id="Australia" edgedefault="directed">
+        <node id="WA">
+            <data key="x">120</data>
+            <data key="y">24</data>
+        </node>
+        <node id="T">
+            <data key="x">145</data>
+            <data key="y">42</data>
+        </node>
+        <node id="SA">
+            <data key="x">135</data>
+            <data key="y">30</data>
+        </node>
+        <node id="NT">
+            <data key="x">135</data>
+            <data key="y">20</data>
+        </node>
+        <node id="NSW">
+            <data key="x">145</data>
+            <data key="y">32</data>
+        </node>
+        <node id="Q">
+            <data key="x">145</data>
+            <data key="y">20</data>
+        </node>
+        <node id="V">
+            <data key="x">145</data>
+            <data key="y">37</data>
+        </node>
+
+        <!-- Edges -->
+        <edge source="SA" target="WA" weight="1"/>
+        <edge source="SA" target="NT" weight="1"/>
+        <edge source="SA" target="Q" weight="1"/>
+        <edge source="SA" target="NSW" weight="1"/>
+        <edge source="SA" target="V" weight="1"/>
+        
+        <edge source="NT" target="WA" weight="1"/>
+        <edge source="NT" target="Q" weight="1"/>
+        
+        <edge source="NSW" target="Q" weight="1"/>
+        <edge source="NSW" target="V" weight="1"/>
+    </graph>
+</graphml>

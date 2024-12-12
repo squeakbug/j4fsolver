@@ -1,6 +1,9 @@
------------------------------
--- Compare Graph Searchers --
------------------------------
+module Comparison where
+
+import LibSolver.Search
+import LibSolver.Search.Uninformed
+import LibSolver.Search.Compare
+import LibSolver.Search.Informed
 
 -- |Run all search algorithms over a particular problem and print out
 --  performance statistics.

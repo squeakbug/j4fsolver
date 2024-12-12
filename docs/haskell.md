@@ -7,16 +7,11 @@
 
 -- --
 
-* [Simon Peyton Jones](https://github.com/simonpj)
-    * Implementing Functional Languages
-* [Simon Marlow](https://github.com/simonmar)
-    * Parallel and Concurrent Programming in Haskell
-* [Vitaly Bragilevsky](https://github.com/bravit)
-    * Haskell in Depth
-* [Alexander Granin](https://github.com/graninas)
-    * Pragmatic Type-Level Design
-    * Functional Design and Architecture
-
--- --
-
 * [Tutorials](https://github.com/serokell)
+
+-- -- --
+
+## C++
+
+* [Pattern matching or structured binding](https://en.cppreference.com/w/cpp/language/structured_binding)
+* [CTAD or template argument inference](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)

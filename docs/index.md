@@ -1,13 +1,32 @@
 # Index
 
-- [Книга по искусственному интеллекту](https://aima.cs.berkeley.edu/)
-- [Примеры на Python к этой книге](https://github.com/aimacode/aima-python)
+1. [Agents. Modeling. Search space. Control theory]()
+    1. [Multiagent](multiagent.md)
 
-- Paradigms of Artificial Intelligence Programming. Case Studies in Common Lisp. Peter Norvig (1992)
-- Artificial intelligence: a new synthesis. Nilsson, Nils J (2003)
-- Artificial Intelligence. Structures and Strategies for Complex Problem Solving. Sixth Edition. George F. Luger (2009)
-- Handbook of Neuroevolution Through Erlang. Gene I. Sher (2013)
-- Pattern Recognition and Machine Learning. Bishop, Christopher M (2016)
-- Artificial Intelligence. A Modern Approach. 4th Edition. Peter Norvig and Stuart Russell (2021)
-- Как учится машина. Революция в области нейронных сетей и глубокого обучения. Лекун, Ян (2021)
-- Foundations of Data Science. Avrim Blum, John Hopcroft, and Ravindran Kannan
+2. [Search](search.md)
+    1. [And-Or-Tree](and_or_tree.md)
+    2. [Game theory. Adversarial](adversarial.md) 
+
+3. CSP. ASN. SAT. SMT. MIR
+    1. [Main definitions](csp_smt_comparison.md)
+    2. [CSP](csp.md)
+    3. [MIR](integer.md)
+    4. [SAT/SMT](sat_smt.md)
+
+3. [Logic. Abstract algebra](logic.md)
+    1. [Category theory](cats.md)
+    2. [Fuzzy logic](fuzzy.md)
+    3. [Graphs](graphs.md)
+    4. [Graph rewriting](graph_rewriting.md)
+    5. [Interpretation](interpretation.md)
+
+4. Compute algebra
+    1. [Compute](compute.md)
+    2. [Automatic differentiation](ad.md)
+    3. [Probalistic learning](probalistic.md)
+
+5. Other
+    1. [Haskell](haskell.md)
+    2. [Program synthesis](program_synthesis.md)
+
+6. [Literature](literature.md)

@@ -1,0 +1,124 @@
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+    <graph id="Romania" edgedefault="directed">
+        <node id="A">
+            <data key="x">91</data>
+            <data key="y">491</data>
+        </node>
+        <node id="B">
+            <data key="x">400</data>
+            <data key="y">327</data>
+        </node>
+        <node id="C">
+            <data key="x">253</data>
+            <data key="y">288</data>
+        </node>
+        <node id="D">
+            <data key="x">165</data>
+            <data key="y">299</data>
+        </node>
+        <node id="E">
+            <data key="x">562</data>
+            <data key="y">293</data>
+        </node>
+        <node id="F">
+            <data key="x">305</data>
+            <data key="y">449</data>
+        </node>
+        <node id="G">
+            <data key="x">375</data>
+            <data key="y">270</data>
+        </node>
+        <node id="H">
+            <data key="x">534</data>
+            <data key="y">350</data>
+        </node>
+        <node id="I">
+            <data key="x">473</data>
+            <data key="y">506</data>
+        </node>
+        <node id="L">
+            <data key="x">165</data>
+            <data key="y">379</data>
+        </node>
+        <node id="M">
+            <data key="x">168</data>
+            <data key="y">339</data>
+        </node>
+        <node id="N">
+            <data key="x">406</data>
+            <data key="y">537</data>
+        </node>
+        <node id="O">
+            <data key="x">131</data>
+            <data key="y">571</data>
+        </node>
+        <node id="P">
+            <data key="x">320</data>
+            <data key="y">368</data>
+        </node>
+        <node id="R">
+            <data key="x">233</data>
+            <data key="y">410</data>
+        </node>
+        <node id="S">
+            <data key="x">207</data>
+            <data key="y">457</data>
+        </node>
+        <node id="T">
+            <data key="x">94</data>
+            <data key="y">410</data>
+        </node>
+        <node id="U">
+            <data key="x">456</data>
+            <data key="y">350</data>
+        </node>
+        <node id="V">
+            <data key="x">509</data>
+            <data key="y">444</data>
+        </node>
+        <node id="Z">
+            <data key="x">108</data>
+            <data key="y">531</data>
+        </node>
+
+        <!-- Edges -->
+        <edge source="A" target="Z" weight="75"/>
+        <edge source="A" target="S" weight="140"/>
+        <edge source="A" target="T" weight="118"/>
+        
+        <edge source="B" target="U" weight="85"/>
+        <edge source="B" target="P" weight="101"/>
+        <edge source="B" target="G" weight="90"/>
+        <edge source="B" target="F" weight="211"/>
+
+        <edge source="C" target="D" weight="120"/>
+        <edge source="C" target="R" weight="146"/>
+        <edge source="C" target="P" weight="138"/>
+
+        <edge source="D" target="M" weight="75"/>
+
+        <edge source="E" target="H" weight="86"/>
+
+        <edge source="F" target="S" weight="99"/>
+
+        <edge source="H" target="U" weight="98"/>
+
+        <edge source="I" target="V" weight="92"/>
+        <edge source="I" target="N" weight="87"/>
+
+        <edge source="L" target="T" weight="111"/>
+        <edge source="L" target="M" weight="70"/>
+
+        <edge source="O" target="Z" weight="71"/>
+        <edge source="O" target="S" weight="151"/>
+
+        <edge source="P" target="R" weight="97"/>
+
+        <edge source="R" target="S" weight="80"/>
+
+        <edge source="U" target="V" weight="142"/>
+    </graph>
+</graphml>
