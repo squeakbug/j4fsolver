@@ -14,7 +14,7 @@ import LibSolver.Types.Table
 
 -- |Wrapper for a problem that keeps statistics on how many times nodes were
 --  expanded in the course of a search. We track the number of times 'goalCheck'
---  was called, the number of times 'successor' was called, and the total number
+--  was called, the number of times 'result' was called, and the total number
 --  of states expanded.
 data ProblemIO p s a = PIO
     { problemIO     :: p s a
@@ -40,11 +40,15 @@ instance (Problem p s a, Eq s, Show s) => Problem (ProblemIO p) s a where
         modifyIORef n (+1)
         return (goalTest p s)
 
-    successor (PIO p _ n m) s = unsafePerformIO $ do
-        let succs = successor p s
+    actions (PIO p _ _ n) s = unsafePerformIO $ do
+        let acts = actions p s
+        modifyIORef n (+length acts)
+        return acts
+
+    result (PIO p _ n _) s a = unsafePerformIO $ do
+        let res = result p s a
         modifyIORef n (+1)
-        modifyIORef m (+length succs)
-        return succs
+        return res
 
     costP (PIO p _ _ _) = costP p
 
@@ -56,11 +60,11 @@ instance (Problem p s a, Eq s, Show s) => Problem (ProblemIO p) s a where
 testSearcher :: p s a -> (ProblemIO p s a -> t) -> IO (t,Int,Int,Int)
 testSearcher prob searcher = do
     p@(PIO _ numGoalChecks numSuccs numStates) <- mkProblemIO prob
-    let result = searcher p in result `seq` do
+    let result' = searcher p in result' `seq` do
         i <- readIORef numGoalChecks
         j <- readIORef numSuccs
         k <- readIORef numStates
-        return (result, i, j, k)
+        return (result', i, j, k)
 
 -- |NFData instance for search nodes.
 instance (NFData s, NFData a) => NFData (Node s a) where
@@ -74,11 +78,11 @@ instance (NFData s, NFData a) => NFData (Node s a) where
 testSearcher' :: (NFData t) => p s a -> (ProblemIO p s a -> t) -> IO (t,Int,Int,Int,Int)
 testSearcher' prob searcher = do
     p@(PIO _ numGoalChecks numSuccs numStates) <- mkProblemIO prob
-    (result, t) <- timed (searcher p)
+    (result', t) <- timed (searcher p)
     i <- readIORef numGoalChecks
     j <- readIORef numSuccs
     k <- readIORef numStates
-    return (result, t, i, j, k)
+    return (result', t, i, j, k)
 
 -- |Test multiple searchers on the same problem, and return a list of results
 --  and statistics.

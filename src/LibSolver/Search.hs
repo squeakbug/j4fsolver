@@ -35,7 +35,7 @@ path n = case parent n of
 -- |Возвращает список узлов, непосредственно достижимых из данного узла в контексте указанной проблемы.
 --  Обновляет depth у дочерних узлов
 expand :: (Problem p s a) => p s a -> Node s a -> [Node s a]
-expand p node = [ mkNode a s | (a,s) <- successor p (state node) ]
+expand p node = [ mkNode a (result p (state node) a) | a <- actions p (state node) ]
     where
         mkNode a s = Node s (Just node) (Just a) (c a s) (1 + depth node) v
         c          = costP p (cost node) (state node)
@@ -56,9 +56,11 @@ class Eq s => Problem p s a where
     -- | Начальное состояние
     initial :: p s a -> s
 
-    -- | Принимает значение списка состояний и действий для их достижения
-    --   Список материализуется лениво
-    successor :: p s a -> s -> [(a, s)]
+    -- | Список доступных из состояния действий
+    actions :: p s a -> s -> [a]
+
+    -- | Результат применения действия в данном состоянии
+    result :: p s a -> s -> a -> s
 
     -- | Если у задачи есть только одно конечное состояние, этот метод должен вернуть его
     goal :: p s a -> s

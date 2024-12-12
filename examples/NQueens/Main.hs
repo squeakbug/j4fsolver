@@ -41,11 +41,11 @@ instance Problem NQueens [Maybe Int] (Int,Int) where
 
     -- @L.elemIndex Nothing s@ finds the index of the first column in s
     -- that doesn't yet have a queen.
-    successor (NQ n) s = case L.elemIndex Nothing s of
+    actions (NQ n) s = case L.elemIndex Nothing s of
         Nothing -> []
-        Just i  -> zip actions (map (`updateNQ` s) actions)
-            where
-                actions = map (,i) [0..n-1]
+        Just i  -> map (,i) [0..n-1]
+
+    result _ s a = updateNQ a s
 
     -- ((0, 0), [(0, 0), (0, 0), (0, 0), (0, 0)]) ; 
     -- ((1, 0), []) ; 
@@ -66,5 +66,5 @@ eightQueens = NQ 8
 main :: IO ()
 main = do
     let x = eightQueens
-    let result = breadthFirstGraphSearch x
-    print result
+    let result' = breadthFirstGraphSearch x
+    print result'

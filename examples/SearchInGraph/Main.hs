@@ -70,7 +70,8 @@ data GraphProblem s a = GP
 instance Ord s => Problem GraphProblem s s where
     initial = initGP
     goal = goalGP
-    successor (GP g _ _) s = [ (x,x) | (x,_) <- getNeighbours s g ]
+    actions (GP g _ _) s = [ x | (x,_) <- getNeighbours s g ]
+    result _ _ a = a
     costP (GP g _ _) c s _ s' = c + costFromTo g s s'
     heuristic (GP g _ goal) n = euclideanDist x y
         where

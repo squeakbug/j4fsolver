@@ -1,4 +1,4 @@
-module LibSolver.SAT.Brootforce where
+module LibSolver.SAT.Bruteforce where
 
 import LibSolver.BoolExpr
   ( BoolExpr(..)
